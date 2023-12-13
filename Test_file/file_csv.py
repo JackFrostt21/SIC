@@ -17,3 +17,17 @@ with open(file_name, 'r', newline='') as file:
     reader = csv.reader(file)
     for i in reader:
         print(i[0], ' - ', i[1])
+
+
+#Добавляем запись в начало файла
+
+with open(file_name, 'r', newline='') as file:
+    reader = csv.reader(file)
+    users = list(reader)
+
+new_user = ['Jerry', 22]
+users.insert(0, new_user)
+
+with open(file_name, 'w', newline='') as file:
+    writer = csv.writer(file)
+    writer.writerows(users)
