@@ -57,25 +57,30 @@ def add_guid_to_conf(config, csv_data):
         ]  # убираем разрыв основного блока в конф файле и новой гуид строки
         if guid:
             guid_line = f"guid={guid}"  # создаем строку в которой лежит гуид
-            stroka_guid_yes = any(line.startswith("guid=") for line in block) #проверяем есть ли в блоке строка guid=
+            stroka_guid_yes = any(
+                line.startswith("guid=") for line in block
+            )  # проверяем есть ли в блоке строка guid=
             if stroka_guid_yes:
-                block = [line if not line.startswith("guid=") else guid_line for line in block] #заменяем новой строкой (чтобы не получить дубли)
+                block = [
+                    line if not line.startswith("guid=") else guid_line
+                    for line in block
+                ]  # заменяем новой строкой (чтобы не получить дубли)
             else:
-                block.append(guid_line) #добавляем строку
+                block.append(guid_line)  # добавляем строку
         else:
-            block = [line for line in block if not line.startswith("guid=")] #если гуида в csv нет, то удалеям в конф
-        config[id_asterisk] = block #присваиваем новый блок в словарь
+            block = [
+                line for line in block if not line.startswith("guid=")
+            ]  # если гуида в csv нет, то удалеям в конф
+        config[id_asterisk] = block  # присваиваем новый блок в словарь
     return config
 
 
 # новый conf файл с текущей датой и временем в наименовании
 def write_new_config(config, base_filename):
-    new_conf_file = f'{base_filename}_{datetime.now().strftime("%y-%m-%d-%H-%M")}.conf' #формируем наименование
+    new_conf_file = f'{base_filename}_{datetime.now().strftime("%y-%m-%d-%H-%M")}.conf'  # формируем наименование
     with open(new_conf_file, "w") as file:
         for block in config.values():
-            block_content = "\n".join(
-                block
-            )  # собирает строки в блок с разделением \n
+            block_content = "\n".join(block)  # собирает строки в блок с разделением \n
             file.write(
                 block_content.strip() + "\n\n"
             )  # берем набор блоков, очищаем от лишних пробелов и делаем 2 переноса чтобы разорвать визуально блоки
@@ -92,9 +97,7 @@ csv_dict = read_csv(csv_file)
 updated_config_dict = add_guid_to_conf(config_dict, csv_dict)
 
 # основа для наименования нового конф файла
-base_config_filename = "config"  # не понятна работа строки
+base_config_filename = "config"
 
 # запись обновленного конф в новый файл
-new_config_file = write_new_config(
-    updated_config_dict, base_config_filename
-)
+new_config_file = write_new_config(updated_config_dict, base_config_filename)
