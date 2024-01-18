@@ -28,17 +28,10 @@ def read_csv(csv_file):
     csv_dictionary = {}
     with open(csv_file, newline="", encoding="utf-8") as csvfile:
         reader = csv.reader(csvfile)
-        next(
-            reader
-        )  # пропускает первую строчку (оглавление), если ее нет, закомментить
+        next(reader)  # пропускает первую строчку (оглавление), если ее нет, закомментить
         for row in reader:
             if len(row) >= 4:  # проверка чтобы не поломать алгоритм
-                (
-                    id_asterisk,
-                    _,
-                    guid_1c,
-                    _,
-                ) = row  # присваиваем параметрам (id_asterisk и guid_1c) значения элементов списка, остальное игнорируем
+                (id_asterisk,_,guid_1c,_,) = row  # присваиваем параметрам (id_asterisk и guid_1c) значения элементов списка, остальное игнорируем
                 csv_dictionary[id_asterisk] = guid_1c or None
     return csv_dictionary
 
