@@ -1,36 +1,41 @@
 from django.db import models
 
 class TelegramUser(models.Model):
-    user_eriell = models.CharField(max_length=100)
-    email = models.EmailField(max_length=100)
-    username_telegram = models.CharField(max_length=100)        # поменять на ID телеграм
-    active = models.BooleanField(default=False) #тоже получаю от Димы, добавить к проверке для работы с заявками. Проговорить еще раз логику, пока не понял как корректно устанавливать если только не от Димы
-    internal_number = models.CharField(max_length=100, null=True)   #тоже получаю от Димы, добавить проверку при формировании заявки
-    mobile_phone = models.CharField(max_length=100, null=True)      #тоже получаю от Димы, добавить проверку при формировании заявки
-
-class DirectoryServices(models.Model):
-    name_services = models.CharField(max_length=100, null=True)
-
-class ApplicationForm(models.Model):
-    name_services = models.ForeignKey(DirectoryServices, on_delete=models.PROTECT, null=True)
-    floor = models.IntegerField(max_length=50)
-    block = models.CharField(max_length=50)
-    office_workplace = models.CharField(max_length=100)
-    internal_number = models.IntegerField(max_length=50)
-    mobile_phone = models.IntegerField(max_length=50)
-    application_text = models.TextField()
-
-class Applications(models.Model):
     user_eriell = models.CharField(max_length=100, null=True)
-    name_services = models.CharField(max_length=100, null=True)
-    building = models.CharField(max_length=100, null=True)      #как инлайн кнопки
-    floor = models.CharField(max_length=100, null=True)         #как инлайн кнопки
-    block = models.CharField(max_length=100, null=True)         #как инлайн кнопки
-    office_workplace = models.CharField(max_length=100, null=True)
+    email = models.EmailField(max_length=100)
+    number_user_telegram = models.CharField(max_length=100)
     internal_number = models.CharField(max_length=100, null=True)
     mobile_phone = models.CharField(max_length=100, null=True)
-    application_text = models.TextField(null=True) 
-    
-    #building потом этаж потом блок (выводить только доступные в инлайн кнопки)
+    user_fio = models.CharField(max_length=100, null=True)
 
-    #продумать отправку в чат бот по ответственным name_services(сейчас механизм у ребят есть), как вариант
+
+class DirectoryServices(models.Model):
+    id_servises_dir_serv = models.CharField(primary_key=True, max_length=100) 
+    name_services = models.CharField(max_length=100, null=True)
+
+class Applications(models.Model):
+    user_fio = models.CharField(max_length=100, null=True)
+    user_eriell = models.CharField(max_length=100, null=True)
+    name_services = models.CharField(max_length=100, null=True)
+    building = models.CharField(max_length=100, null=True)
+    floor = models.CharField(max_length=100, null=True)
+    block = models.CharField(max_length=100, null=True)
+    office_workplace = models.CharField(max_length=100, null=True)      
+    internal_number = models.CharField(max_length=100, null=True)       
+    mobile_phone = models.CharField(max_length=100, null=True)          
+    application_text = models.TextField(null=True)
+
+class BuildingEriell(models.Model):
+    id_servises_building = models.CharField(primary_key=True, max_length=100)
+    adress_building = models.CharField(max_length=100, null=True)
+
+class FloorEriell(models.Model):
+    id_servises_floor = models.CharField(primary_key=True, max_length=100)
+    number_floor = models.CharField(max_length=100, null=True)
+
+class BlockEriell(models.Model):
+    id_servises_block = models.CharField(primary_key=True, max_length=100)
+    number_block = models.CharField(max_length=100, null=True)
+
+
+

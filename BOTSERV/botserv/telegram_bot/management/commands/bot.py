@@ -2,7 +2,7 @@ import asyncio
 import logging
 from aiogram import Bot, Dispatcher
 from django.core.management import BaseCommand
-from .handlers import application_handlers, start_handlers, email_handlers
+from .handlers import application_handlers, list_application_handlers, email_handlers
 
 logging.basicConfig(level=logging.INFO)
 
@@ -24,6 +24,7 @@ async def main():
     
     dp.include_router(email_handlers.router)
     dp.include_router(application_handlers.router)
+    dp.include_router(list_application_handlers.router)
 
     await dp.start_polling(bot)
 
