@@ -4,7 +4,6 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from asgiref.sync import sync_to_async
 import re
-import requests
 
 
 from telegram_bot.models import TelegramUser
