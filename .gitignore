@@ -1,7 +1,3 @@
 .mele
 Xedu/
 .educa
-.studentbot
-.env
-db.sqlite3
-educational_bot_prod.sql
