@@ -1,0 +1,94 @@
+{% comment %} <div>
+    <h5 style="padding-left: 50px">Telegram users in base : {{ user_count }} .</h5>
+    <canvas id="TotalUsers" width="400" height="250"></canvas>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const day = '{% for i in total_users %}{{ i.rang }}*{% endfor %}';
+    const day_dict = day.split('*');
+    day_dict.pop();
+
+    const orders = '{% for i in total_users %}{{ i.users }}*{% endfor %}';
+    const orders_dict = orders.split('*');
+    orders_dict.pop();
+
+
+    const ctx3 = document.getElementById('TotalUsers');
+    const data = {
+        labels: day_dict,
+        datasets: [{
+            label: 'Оценка',
+            data: orders_dict,
+            fill: false,
+            borderColor: 'rgba(19,17,17,0.7)',
+            tension: 0.1
+        },
+            {
+                type: 'bar',
+                label: 'Число Пользователей',
+                data: orders_dict,
+                borderColor: 'rgba(13,122,159,0.7)',
+                backgroundColor: 'rgba(13,122,159,0.7)'
+            }]
+    };
+
+    const config = {
+        type: 'line',
+        data: data,
+    };
+
+    new Chart(ctx3, config);
+
+</script> {% endcomment %}
+
+<div>
+    <h5 style="padding-left: 50px">Telegram users in base: {{ user_count }}.</h5>
+    <canvas id="TotalUsers" width="400" height="250"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Создаем массивы с метками и данными напрямую, избегая использования строк
+    const labels = [{% for i in total_users %}"{{ i.rang }}"{% if not forloop.last %}, {% endif %}{% endfor %}];
+    const dataCounts = [{% for i in total_users %}{{ i.users }}{% if not forloop.last %}, {% endif %}{% endfor %}];
+
+    const ctx = document.getElementById('TotalUsers').getContext('2d');
+    const data = {
+        labels: labels,
+        datasets: [
+            {
+                type: 'line',
+                label: 'Число пользователей по оценкам',
+                data: dataCounts,
+                fill: false,
+                borderColor: 'rgba(19,17,17,0.7)',
+                tension: 0.1
+            },
+            {
+                type: 'bar',
+                label: 'Число пользователей',
+                data: dataCounts,
+                backgroundColor: 'rgba(13,122,159,0.7)'
+            }
+        ]
+    };
+
+    const config = {
+        type: 'bar', // Основной тип графика
+        data: data,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true // Начинать шкалу Y с нуля
+                }
+            }
+        }
+    };
+
+    new Chart(ctx, config);
+</script>

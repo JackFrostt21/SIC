@@ -1,0 +1,406 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-04-08 16:37+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: .\app\bot\management\commands\bot_logic\handlers\callbackhandlers\educational_logic.py:52
+msgid "go_test"
+msgstr "🧑‍💻 Перейти к Тестированию"
+
+#: .\app\bot\management\commands\bot_logic\handlers\callbackhandlers\educational_logic.py:61
+#: .\app\bot\management\commands\bot_logic\handlers\callbackhandlers\educational_logic.py:83
+#: .\app\bot\management\commands\bot_logic\handlers\callbackhandlers\educational_logic.py:97
+msgid "btn_back"
+msgstr "◀️ Назад"
+
+#: .\app\bot\management\commands\bot_logic\handlers\callbackhandlers\educational_logic.py:205
+#: .\app\bot\management\commands\bot_logic\handlers\callbackhandlers\educational_logic.py:245
+#: .\app\bot\management\commands\bot_logic\handlers\callbackhandlers\settings_logics.py:52
+#: .\app\bot\management\commands\bot_logic\handlers\main_menu.py:34
+#: .\app\bot\management\commands\bot_logic\handlers\main_menu.py:61
+msgid "btn_close"
+msgstr "❌ Закрыть"
+
+#: .\app\bot\management\commands\bot_logic\handlers\callbackhandlers\settings_logics.py:46
+msgid "done"
+msgstr "✅ Применить"
+
+#: .\app\bot\management\commands\bot_logic\handlers\callbackhandlers\testing_logic.py:26
+msgid "First Complete the training"
+msgstr ""
+
+#: .\app\bot\management\commands\bot_logic\handlers\main_menu.py:21
+#: .\app\bot\management\commands\bot_logic\handlers\main_menu.py:64
+#: .\app\bot\management\commands\bot_logic\handlers\start.py:31
+msgid "self-study"
+msgstr "📚 Самоподготовка"
+
+#: .\app\bot\management\commands\bot_logic\handlers\main_menu.py:24
+msgid "The training manual is not available while testing is in progress."
+msgstr "Учебное пособие недоступно во время тестирования."
+
+#: .\app\bot\management\commands\bot_logic\handlers\main_menu.py:27
+msgid "📓 База Знаний 📔"
+msgstr ""
+
+#: .\app\bot\management\commands\bot_logic\handlers\main_menu.py:38
+#: .\app\bot\management\commands\bot_logic\handlers\main_menu.py:64
+#: .\app\bot\management\commands\bot_logic\handlers\start.py:32
+msgid "testing"
+msgstr "📑 Тестирование"
+
+#: .\app\bot\management\commands\bot_logic\handlers\main_menu.py:49
+msgid "You're already on the test"
+msgstr ""
+
+#: .\app\bot\management\commands\bot_logic\handlers\main_menu.py:51
+#: .\app\bot\management\commands\bot_logic\handlers\main_menu.py:65
+#: .\app\bot\management\commands\bot_logic\handlers\start.py:33
+msgid "self-progress"
+msgstr "🎯 Мой прогресс"
+
+#: .\app\bot\management\commands\bot_logic\handlers\main_menu.py:54
+#: .\app\bot\management\commands\bot_logic\handlers\main_menu.py:64
+#: .\app\bot\management\commands\bot_logic\handlers\start.py:33
+msgid "Settings"
+msgstr "⚙️ Настройки"
+
+#: .\app\bot\management\commands\bot_logic\handlers\registration.py:63
+msgid "Please enter date_of_birth"
+msgstr "Укажите дату рождения."
+
+#: .\app\bot\management\commands\bot_logic\handlers\registration.py:74
+msgid "Share contact"
+msgstr "☎️ Поделиться контактом"
+
+#: .\app\bot\management\commands\bot_logic\handlers\registration.py:76
+msgid "Please enter share contact"
+msgstr "Пожалуйста поделитесь контактом или введите номер."
+
+#: .\app\bot\management\commands\bot_logic\handlers\start.py:82
+#: .\app\bot\management\commands\bot_logic\handlers\start.py:144
+msgid "The module will be available after the Administrator checks."
+msgstr "Модуль будет доступен после проверки Администратором."
+
+#: .\app\bot\models\bot_settings.py:8 .\app\bot\models\bot_settings.py:24
+msgid "id"
+msgstr "ID"
+
+#: .\app\bot\models\bot_settings.py:9 .\app\bot\models\bot_settings.py:27
+#: .\app\educational_module\models.py:10 .\app\educational_module\models.py:29
+#: .\app\educational_module\models.py:58 .\app\educational_module\models.py:79
+msgid "title"
+msgstr "Заголовок"
+
+#: .\app\bot\models\bot_settings.py:10 .\app\bot\models\bot_settings.py:28
+msgid "tag"
+msgstr "Тэг"
+
+#: .\app\bot\models\bot_settings.py:14 .\app\bot\models\bot_settings.py:15
+#: .\app\bot\models\bot_settings.py:25
+msgid "settings"
+msgstr "настройки"
+
+#: .\app\bot\models\bot_settings.py:29
+msgid "value"
+msgstr "значение"
+
+#: .\app\bot\models\bot_settings.py:30 .\app\educational_module\models.py:11
+#: .\app\educational_module\models.py:30 .\app\educational_module\models.py:59
+msgid "description"
+msgstr "описание"
+
+#: .\app\bot\models\bot_settings.py:31
+msgid "photo"
+msgstr "фото"
+
+#: .\app\bot\models\bot_settings.py:37
+msgid "No Image Found"
+msgstr "Изображение не найдено"
+
+#: .\app\bot\models\bot_settings.py:39
+msgid "photo_preview"
+msgstr "Изображение:"
+
+#: .\app\bot\models\bot_settings.py:42
+msgid "sets parameter"
+msgstr "настроечный параметр"
+
+#: .\app\bot\models\bot_settings.py:43
+msgid "sets parameters"
+msgstr "настроечные параметры"
+
+#: .\app\bot\models\testing_module.py:11
+msgid "question"
+msgstr "вопрос"
+
+#: .\app\bot\models\testing_module.py:13 .\app\core\models.py:24
+msgid "user"
+msgstr "пользователь"
+
+#: .\app\bot\models\testing_module.py:16
+#, fuzzy
+#| msgid "training_course"
+msgid "training"
+msgstr "курс самоподготовки"
+
+#: .\app\bot\models\testing_module.py:18
+msgid "user answer"
+msgstr "ответ пользователя"
+
+#: .\app\bot\models\testing_module.py:19
+msgid "complete"
+msgstr "завершено"
+
+#: .\app\bot\models\testing_module.py:25
+msgid "UserTest"
+msgstr "Тест пользователя"
+
+#: .\app\bot\models\testing_module.py:26
+msgid "UserTests"
+msgstr "Тесты пользователей"
+
+#: .\app\core\admin.py:5 .\app\core\admin.py:6
+msgid "Admin"
+msgstr "Админ"
+
+#: .\app\core\apps.py:8
+msgid "Administration and Settings"
+msgstr "Администрирование и настройки"
+
+#: .\app\core\models.py:16
+msgid "ACTION_CREATE"
+msgstr ""
+
+#: .\app\core\models.py:17
+msgid "ACTION_UPDATE"
+msgstr ""
+
+#: .\app\core\models.py:18
+msgid "ACTION_DELETE"
+msgstr ""
+
+#: .\app\core\models.py:20
+msgid "changed"
+msgstr ""
+
+#: .\app\core\models.py:21
+msgid "model"
+msgstr ""
+
+#: .\app\core\models.py:22
+msgid "record_id"
+msgstr ""
+
+#: .\app\core\models.py:27
+msgid "action"
+msgstr ""
+
+#: .\app\core\models.py:28
+msgid "data_history"
+msgstr ""
+
+#: .\app\core\models.py:29
+msgid "data"
+msgstr ""
+
+#: .\app\core\models.py:31
+msgid "ipaddress"
+msgstr ""
+
+#: .\app\core\models.py:35
+msgid "Change log"
+msgstr ""
+
+#: .\app\core\models.py:36
+msgid "Changes log"
+msgstr ""
+
+#: .\app\core\models.py:103
+msgid "exchange_log"
+msgstr ""
+
+#: .\app\educational_module\models.py:23
+msgid "TrainingCourse"
+msgstr "Курс самоподготовки"
+
+#: .\app\educational_module\models.py:24
+msgid "TrainingCourses"
+msgstr "Курсы самоподготовки"
+
+#: .\app\educational_module\models.py:31 .\app\educational_module\models.py:60
+msgid "main_text"
+msgstr "Основной текст"
+
+#: .\app\educational_module\models.py:34
+msgid "training_course"
+msgstr "курс самоподготовки"
+
+#: .\app\educational_module\models.py:38
+msgid "CourseTopic"
+msgstr "Тема курса"
+
+#: .\app\educational_module\models.py:39
+msgid "CourseTopics"
+msgstr "Темы курса"
+
+#: .\app\educational_module\models.py:54 .\app\educational_module\models.py:103
+msgid "more_info"
+msgstr "Больше информации"
+
+#: .\app\educational_module\models.py:63
+msgid "course_topic"
+msgstr "тема курса"
+
+#: .\app\educational_module\models.py:66
+msgid "Subtopic"
+msgstr "Под-тема"
+
+#: .\app\educational_module\models.py:67
+msgid "Subtopics"
+msgstr "Под-темы"
+
+#: .\app\educational_module\models.py:81
+msgid "topic"
+msgstr "тема"
+
+#: .\app\educational_module\models.py:83
+msgid "course"
+msgstr "курс"
+
+#: .\app\educational_module\models.py:87
+msgid "TopicQuestion"
+msgstr "Вопрос по теме"
+
+#: .\app\educational_module\models.py:88
+msgid "TopicQuestions"
+msgstr "Вопросы по темам"
+
+#: .\app\educational_module\models.py:108
+msgid "topic_question"
+msgstr "вопрос по теме"
+
+#: .\app\educational_module\models.py:110
+msgid "number"
+msgstr "порядковый номер"
+
+#: .\app\educational_module\models.py:111
+msgid "text"
+msgstr "текст"
+
+#: .\app\educational_module\models.py:112
+msgid "is_correct"
+msgstr "верно"
+
+#: .\app\educational_module\models.py:115
+msgid "AnswerOption"
+msgstr "Вариант ответа"
+
+#: .\app\educational_module\models.py:116
+msgid "AnswerOptions"
+msgstr "Варианты ответов"
+
+#: .\app\settings.py:119
+msgid "Russia"
+msgstr ""
+
+#: .\app\settings.py:120
+msgid "English"
+msgstr ""
+
+#: .\app\settings.py:121
+msgid "O'zbek tili"
+msgstr ""
+
+#: .\app\settings.py:156
+msgid "BotSettings_JET_MENU_ITEMS"
+msgstr "Управление Ботом"
+
+#: .\app\settings.py:158
+msgid "TelegramUser_JET_MENU_ITEMS"
+msgstr "📱 Пользователи Telegram"
+
+#: .\app\settings.py:159
+msgid "Settings_JET_MENU_ITEMS"
+msgstr "⚙️ Настройки Бота"
+
+#: .\app\settings.py:161
+msgid "Educational_JET_MENU_ITEMS"
+msgstr "Модуль обучения"
+
+#: .\app\settings.py:163
+msgid "TrainingCourse_JET_MENU_ITEMS"
+msgstr "📕 Основные Курсы"
+
+#: .\app\settings.py:164
+msgid "CourseTopic_JET_MENU_ITEMS"
+msgstr "📙 Темы курсов"
+
+#: .\app\settings.py:165
+msgid "TopicQuestion_JET_MENU_ITEMS"
+msgstr "📗 Вопросы для тестирования"
+
+#: .\app\settings.py:166
+#, fuzzy
+#| msgid "Educational_JET_MENU_ITEMS"
+msgid "Educational_bot_JET_MENU_ITEMS"
+msgstr "Модуль обучения"
+
+#: .\app\settings.py:168
+msgid "AdministratorSettings_JET_MENU_ITEMS"
+msgstr "Настройки администратора"
+
+#: .\app\settings.py:169
+msgid "Users_JET_MENU_ITEMS"
+msgstr "Пользователи"
+
+#: .\app\settings.py:170
+msgid "Groups_JET_MENU_ITEMS"
+msgstr "Группы"
+
+#: .\app\settings.py:171
+msgid "Model logging_JET_MENU_ITEMS"
+msgstr "Модели"
+
+#: .\app\settings.py:172
+msgid "Exchange logging_JET_MENU_ITEMS"
+msgstr "Логи Обмена"
+
+#: .\app\settings.py:173
+msgid "Request logging_JET_MENU_ITEMS"
+msgstr "Логи Запросов"
+
+#: .\app\settings.py:175
+msgid "APIDocs_JET_MENU_ITEMS"
+msgstr "📑 APIDocs"
+
+#: .\app\settings.py:176
+msgid "Swagger_JET_MENU_ITEMS"
+msgstr "🧩 Swagger"
+
+#: .\app\settings.py:177
+msgid "redoc_JET_MENU_ITEMS"
+msgstr "🧩 redoc"
+
+#: .\app\widgets.py:11
+msgid "Total Users"
+msgstr "📈 Отчёт по успеваемости"
+
+#: .\app\widgets.py:57
+msgid "Total User Info"
+msgstr "📉 Общий отчёт по подготовке"
