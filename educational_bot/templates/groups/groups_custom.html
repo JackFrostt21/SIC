@@ -1,0 +1,101 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/groups_style.css' %}">
+    
+<div class="horizontal-divider" style="height: 1px; background-color: #ddd; margin-bottom: 20px; width: 100%;"></div>
+
+<div class="row_all">
+    <div class="col-md-4 groups">
+        <h3 class="groups_title">Выберите группу</h3>
+        <ul class="group_list">
+            {% for group in groups %}
+                <li class="groups_list_item">
+                    <a href="?group_id={{ group.id }}">{{ group.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="vertical-divider" style="width: 1px; background-color: #ddd; height: 1000px; margin-top: -20px;"></div>
+
+    <div class="group_selected">
+        <div class="table_row_title">
+            <h4 class="table_row_title_group">Выбранная группа: {{ selected_group.name }}</h4>
+        </div>
+        
+        <div class="table_row_users">
+            <div class="col-md-4 users">
+                <h3 class="table_row_users_title">Доступные пользователи</h3>
+                {% if selected_group %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add">
+                        <ul class="users_list">
+                            {% for student in students %}
+                                <li class="users_list_item">
+                                    <span class="user_link_span" tabindex="0" onclick="addStudent('{{ student.id }}')">
+                                        {{ student.user_name }}
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                         <button type="submit" class="btn btn-add_users">Добавить</button>
+                        <input type="hidden" name="student_ids" id="student_ids" value="" />
+                    </form>
+                {% else %}
+                    <p>Выберите группу, чтобы увидеть доступных пользователей.</p>
+                {% endif %}
+            </div>
+
+            <div class="col-md-4 added_users">
+                <h3 class="table_row_users_title">Пользователи в группе</h3>
+                {% if selected_group %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="remove">
+                        <ul class="added_users_list">
+                            {% for student in selected_group_students %}
+                                <li class="added_users_list_item">
+                                    <a class="user_link" href="#" onclick="toggleStudent({{ student.id }})">
+                                        {{ student.user_name }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <input type="hidden" name="student_ids" id="student-ids" value="">
+                        <button type="submit" class="btn btn-delete">Удалить</button>
+                    </form>
+                {% else %}
+                    <p>Выберите группу, чтобы увидеть её пользователей.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleStudent(studentId) {
+    let currentIds = document.getElementById('student-ids').value;
+    let idArray = currentIds ? currentIds.split(',') : [];
+
+    if (idArray.includes(studentId.toString())) {
+        idArray = idArray.filter(id => id !== studentId.toString());
+    } else {
+        idArray.push(studentId.toString());
+    }
+
+    document.getElementById('student-ids').value = idArray.join(',');
+}
+
+let studentIds = [];
+
+function addStudent(studentId) {
+    if (!studentIds.includes(studentId)) {
+        studentIds.push(studentId);
+    }
+    document.getElementById('student_ids').value = studentIds.join(',');
+}
+
+</script>
+{% endblock %}
