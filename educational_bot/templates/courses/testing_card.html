@@ -1,0 +1,180 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Настройки тестирования</title>
+    <link rel="stylesheet" href="{% static 'css/testing_card.css' %}">
+</head>
+<body>
+<div class="container">
+    <aside class="sidebar">
+        <img src="{% static 'logo.png' %}" alt="Логотип" class="logo">
+        <h2>Список вопросов:</h2>
+        <ul class="question-list">
+            {% for question in questions %}
+                <li class="question-item"
+                    data-question-id="{{ question.id }}"
+                    data-question-title="{{ question.title }}">
+                    {{ forloop.counter }}. {{ question.title }}
+                </li>
+                {% empty %}
+                <li>Нет вопросов</li>
+            {% endfor %}
+        </ul>
+        <button class="add-question">+ Добавить вопрос</button>
+    </aside>
+
+    <main class="content">
+        <h1>Настройки тестирования по курсу: Наименование курса</h1>
+
+        <div class="form-group">
+            <input type="hidden" id="question-id" name="question_id"> <!-- Скрытое поле для ID вопроса -->
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="display-question"> Отобразить вопрос</label>
+            </div>
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="multiple-choice"> Множественный выбор</label>
+            </div>
+
+            <div class="input-group">
+                <label>Текст вопроса</label>
+                <input type="text" id="question-text" readonly>
+            </div>
+
+            <h2>Ответы:</h2>
+            <table class="answers-table">
+                <thead>
+                <tr>
+                    <th>Отобразить</th>
+                    <th>Верно</th>
+                    <th>Текст ответа</th>
+                    <th>Номер</th>
+                </tr>
+                </thead>
+                <tbody id="answers-list">
+                <!-- Ответы будут добавляться сюда динамически -->
+                </tbody>
+            </table>
+            <button class="add-answer">+ Добавить вариант ответа</button>
+            <button class="save-button">Сохранить</button>
+        </div>
+    </main>
+</div>
+
+<footer class="footer">
+    <p>Проект компании ООО "ЦЦ ТЭК"</p>
+    <p>© 2023-2024 cdtek.ru | Все права защищены</p>
+</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const questionItems = document.querySelectorAll('.question-item');
+
+        questionItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Удаляем выделение у всех вопросов
+                questionItems.forEach(i => i.classList.remove('selected'));
+                // Добавляем выделение к выбранному вопросу
+                item.classList.add('selected');
+
+                // Получение данных вопроса
+                const questionId = item.getAttribute('data-question-id');
+                const questionTitle = item.getAttribute('data-question-title');
+
+                // Заполнение формы вопроса
+                document.getElementById('question-text').value = questionTitle;
+
+                // Обновляем скрытое поле с ID вопроса
+                document.getElementById('question-id').value = questionId;
+
+                // Загружаем ответы для выбранного вопроса
+                loadAnswers(questionId);
+            });
+        });
+
+        // Обработчик для кнопки "Сохранить"
+        document.querySelector('.save-button').addEventListener('click', () => {
+            const questionId = document.getElementById('question-id').value;
+            const answers = [];
+            const answerRows = document.querySelectorAll('#answers-list tr');
+
+            answerRows.forEach(row => {
+                const textArea = row.querySelector('textarea');
+                const correctCheckbox = row.querySelector('input[type="checkbox"]:nth-child(2)');
+
+                if (textArea && correctCheckbox) {
+                    const text = textArea.value; // Получаем текст из textarea
+                    const correct = correctCheckbox.checked; // Получаем значение чекбокса "Верно"
+                    answers.push({text, correct});
+                } else {
+                    console.warn('Некоторые элементы не найдены в строке ответа', row);
+                }
+            });
+
+            fetch(`save-answer/${questionId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'), // Для безопасности при отправке POST-запроса
+                },
+                body: JSON.stringify({answers})
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Ответы успешно сохранены!');
+                    } else {
+                        alert('Ошибка при сохранении ответов.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                });
+        });
+    });
+
+    function loadAnswers(questionId) {
+        fetch(`answer-list/${questionId}/`) // Замените на правильный URL
+            .then(response => response.json())
+            .then(answers => {
+                const answersList = document.getElementById('answers-list');
+                answersList.innerHTML = ''; // Очистка текущих ответов
+
+                answers.forEach((answer, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><input type="checkbox"></td>
+                        <td><input type="checkbox" ${answer.correct ? 'checked' : ''}></td>
+                        <td><textarea rows="3" cols="50">${answer.text}</textarea></td>
+                        <td>${String.fromCharCode(65 + index)}</td> <!-- Генерируем буквы A, B, C и т.д. -->
+                    `;
+                    answersList.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+            });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Interface</title>
+    <link rel="stylesheet" href="{% static 'css/user_card.css' %}">
+</head>
+<body>
+<div class="container">
+    <aside class="sidebar">
+        <input type="text" placeholder="Поиск...">
+        <ul class="user-list">
+            {% for user in users %}
+                <li
+                        class="user-item"
+                        data-telegram-id="{{ user.user_id }}"
+                        data-phone="{{ user.phone }}"
+                        data-email="{{ user.email }}"
+                        data-first-name="{{ user.first_name }}"
+                        data-last-name="{{ user.last_name }}"
+                        data-middle-name="{{ user.middle_name }}"
+                        data-country="{{ user.country }}"
+                        data-organization="{{ user.company }}"
+                        data-username="{{ user.user_name }}">
+                    {{ user.user_name }}
+                </li>
+                {% empty %}
+                <li>Нет пользователей</li>
+            {% endfor %}
+        </ul>
+        <button class="add-user">+ Добавить пользователя</button>
+        <p class="sidebar-note">Навигация по списку пользователей меняет изображение в правой части экрана</p>
+    </aside>
+
+    <main class="form-content">
+        <form class="user-form" method="post">
+            {% csrf_token %}
+
+            <div class="form-row">
+                <label>Telegram ID</label>
+                <input type="text" placeholder="Telegram ID">
+                <div class="file-upload">
+                    <input type="file" id="file-input" hidden>
+                    <button type="button" class="upload-button"
+                            onclick="document.getElementById('file-input').click();">
+                        Загрузить файл
+                    </button>
+                    <span class="file-name">Файл не выбран</span>
+
+                </div>
+
+            </div>
+            <div class="form-row">
+                <label>Телефон</label>
+                <input type="text" placeholder="Телефон">
+            </div>
+            <div class="form-row">
+                <label>Email</label>
+                <input type="email">
+            </div>
+            <div class="form-row">
+                <label>Фамилия</label>
+                <input type="text" placeholder="Фамилия">
+            </div>
+            <div class="form-row">
+                <label>Имя</label>
+                <input type="text" placeholder="Имя">
+            </div>
+            <div class="form-row">
+                <label>Отчество</label>
+                <input type="text" placeholder="Отчество">
+            </div>
+            <div class="form-row">
+                <label>Страна</label>
+                <input type="text" placeholder="Страна">
+            </div>
+            <div class="form-row">
+                <label>Организация</label>
+                <input type="text" placeholder="Организация">
+            </div>
+            <div class="form-row">
+                <label>Логин</label>
+                <input type="text" placeholder="Логин">
+            </div>
+            <button type="button" id="save-button" class="save-button" disabled>Сохранить</button>
+        </form>
+    </main>
+</div>
+</body>
+</html>
+<script>
+    const fileInput = document.getElementById('file-input');
+    const fileName = document.querySelector('.file-name');
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            fileName.textContent = fileInput.files[0].name;
+        } else {
+            fileName.textContent = 'Файл не выбран';
+        }
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const userItems = document.querySelectorAll('.user-item');
+        const saveButton = document.getElementById('save-button');
+
+        let selectedUserId = null; // Хранит ID выбранного пользователя
+
+        userItems.forEach(item => {
+            item.addEventListener('click', () => {
+                userItems.forEach(user => user.classList.remove('selected')); // Снятие выделения
+                item.classList.add('selected'); // Добавление выделения
+
+                selectedUserId = item.getAttribute('data-telegram-id'); // Сохраняем ID пользователя
+
+                document.querySelector('input[placeholder="Telegram ID"]').value = selectedUserId;
+                document.querySelector('input[placeholder="Телефон"]').value = item.getAttribute('data-phone');
+                document.querySelector('input[type="email"]').value = item.getAttribute('data-email');
+                document.querySelector('input[placeholder="Фамилия"]').value = item.getAttribute('data-last-name');
+                document.querySelector('input[placeholder="Имя"]').value = item.getAttribute('data-first-name');
+                document.querySelector('input[placeholder="Отчество"]').value = item.getAttribute('data-middle-name');
+                document.querySelector('input[placeholder="Страна"]').value = item.getAttribute('data-country');
+                document.querySelector('input[placeholder="Организация"]').value = item.getAttribute('data-organization');
+                document.querySelector('input[placeholder="Логин"]').value = item.getAttribute('data-username');
+
+                saveButton.disabled = false; // Включаем кнопку "Сохранить"
+            });
+        });
+
+        saveButton.addEventListener('click', () => {
+            if (!selectedUserId) return; // Проверяем, что пользователь выбран
+
+            const data = {
+                telegram_id: selectedUserId,
+                phone: document.querySelector('input[placeholder="Телефон"]').value,
+                email: document.querySelector('input[type="email"]').value,
+                last_name: document.querySelector('input[placeholder="Фамилия"]').value,
+                first_name: document.querySelector('input[placeholder="Имя"]').value,
+                middle_name: document.querySelector('input[placeholder="Отчество"]').value,
+                country: document.querySelector('input[placeholder="Страна"]').value,
+                organization: document.querySelector('input[placeholder="Организация"]').value,
+                username: document.querySelector('input[placeholder="Логин"]').value,
+            };
+
+            // Отправляем данные на сервер с помощью AJAX
+            fetch('update-user/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken() // Функция для получения CSRF-токена
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Данные успешно сохранены!');
+                    } else {
+                        alert('Ошибка при сохранении данных.');
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
+        });
+
+        // Функция для получения CSRF-токена
+        function getCsrfToken() {
+            return document.querySelector('[name=csrfmiddlewaretoken]').value;
+        }
+    });
+
+
+</script>
