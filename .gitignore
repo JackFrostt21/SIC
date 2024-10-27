@@ -1,1 +1,9 @@
 .frontend
+.TGBOT
+.env
+.groosha
+.studentbot
+db.sqlite3
+educational_bot_prod.sql
+cert.pem
+key.pem

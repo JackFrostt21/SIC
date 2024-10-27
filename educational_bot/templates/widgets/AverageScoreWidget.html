@@ -1,0 +1,61 @@
+<div>
+    <h5 style="padding-left: 50px">Средний процент правильных ответов по курсам:</h5>
+    <canvas id="AverageScoreChart" width="400" height="250"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const labelsAverageScore = [
+        {% for course in courses %}
+            "{{ course.course_name }}"{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    ];
+
+    const averageScores = [
+        {% for course in courses %}
+            {{ course.average_correct }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    ];
+
+    // Добавляем вывод в консоль для отладки
+    console.log("Labels:", labelsAverageScore);
+    console.log("Average Scores:", averageScores);
+
+    // Проверка на правильное количество элементов в массивах
+    console.log("Number of Labels:", labelsAverageScore.length);
+    console.log("Number of Average Scores:", averageScores.length);
+
+    // Проверка на соответствие данных меткам
+    for (let i = 0; i < labelsAverageScore.length; i++) {
+        console.log(`Course: ${labelsAverageScore[i]}, Average Score: ${averageScores[i]}`);
+    }
+
+    const ctxAverageScore = document.getElementById('AverageScoreChart').getContext('2d');
+    const dataAverageScore = {
+        labels: labelsAverageScore,
+        datasets: [{
+            type: 'bar',
+            label: 'Процент',
+            data: averageScores,
+            backgroundColor: 'rgba(75, 192, 192, 0.7)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+        }]
+    };
+
+    const configAverageScore = {
+        type: 'bar',
+        data: dataAverageScore,
+        options: {
+            indexAxis: 'x',
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    };
+
+    new Chart(ctxAverageScore, configAverageScore);
+</script>

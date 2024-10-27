@@ -1,0 +1,342 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <input type="hidden" name="deleted_users" id="deleted_users" value="">
+    <input type="hidden" name="deleted_groups" id="deleted_groups" value="">
+    <input type="hidden" name="deleted_job_titles" id="deleted_job_titles" value="">
+    
+    <div style="display: flex; min-height: 100vh; align-items: stretch;">
+        <!-- Левый блок - Список молний (сайдбар) -->
+        <div style="width: 10%; padding-right: 20px; min-width: 200px;">
+            <h4>Молнии:</h4>
+            <ul style="list-style: none; padding: 0;">
+                {% for lightning in lightnings %}
+                <li style="padding: 5px; border: 1px solid #ddd; margin-bottom: 1px; background-color: #00234b;">
+                    <a href="{% url 'lightning_custom' lightning.id %}" style="color: white; word-wrap: break-word; word-break: break-word; display: block;">
+                        {{ lightning.title }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            <button type="button" onclick="window.location.href='{% url 'lightning_custom_create' %}'" class="create-button">
+                Создать молнию
+            </button>
+        </div>
+
+        <!-- Разделяющая вертикальная линия -->
+        <div class="vertical-divider"></div>
+
+        <!-- Правый блок - Информация о выбранной молнии -->
+        <div style="width: 70%; padding-left: 20px;">
+            {% if lightning %}
+            <!-- Заголовок по центру -->
+            <h2 style="text-align: center;">Молния: {{ lightning.title }}</h2>
+            <hr style="border: 1px solid black;" />
+
+            <!-- Вкладки -->
+            <div style="display: flex; justify-content: flex-start; margin-bottom: 20px;">
+                <button type="button" class="tab-button" style="background-color: lightblue;">Основное меню</button>
+                <button type="button" class="tab-button" style="background-color: lightblue;">Сообщения</button>
+                <button type="button" class="tab-button" style="background-color: lightblue;">Тестирование</button>
+            </div>
+
+            <!-- Кнопка "Отправить молнию" -->
+            <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+                <button type="button" class="send-lightning-button">Отправить молнию</button>
+            </div>   
+
+            <!-- Информация о молнии -->
+            <div style="display: flex; justify-content: space-between;">
+                <div style="width: 75%; padding-right: 10px;">
+                    <!-- Поля с вводом текста под названием -->
+                    <p><strong>Название молнии:</strong></p>
+                    <input type="text" name="title" value="{{ lightning.title }}" style="width: 100%; margin-bottom: 10px;">
+
+                    <p><strong>Описание последствий:</strong></p>
+                    <textarea name="description_of_consequences" style="width: 100%; margin-bottom: 10px;">{{ lightning.description_of_consequences }}</textarea>
+
+                    <p><strong>Место инцидента:</strong></p>
+                    <input type="text" name="incident_location" value="{{ lightning.incident_location }}" style="width: 100%; margin-bottom: 10px;">
+
+                    <p><strong>Координаты инцидента:</strong></p>
+                    <input type="text" name="incident_coordinates" value="{{ lightning.incident_coordinates }}" style="width: 100%; margin-bottom: 10px;">
+
+                    <p><strong>План мероприятий по ликвидации инцидента:</strong></p>
+                    <textarea name="plan_of_action" style="width: 100%; margin-bottom: 10px;">{{ lightning.plan_of_action }}</textarea>
+
+                    <p><strong>Ответственные:</strong></p>
+                    <input type="text" name="responsible_persons" value="{{ lightning.responsible_persons }}" style="width: 100%; margin-bottom: 10px;">
+
+                    <p><strong>Минимальный процент сдачи теста:</strong></p>
+                    <input type="number" name="min_test_percent_course" value="{{ lightning.min_test_percent_course }}" min="0" max="100" style="width: 100%; margin-bottom: 10px;">
+                </div>
+            </div>
+
+            <!-- Адресаты молнии -->
+            <h4 style="text-align: left; margin-top: 20px;">Адресаты молнии:</h4>
+            <div style="display: flex; justify-content: flex-start; gap: 20px; margin-bottom: 20px;">
+                {% if lightning.pk %}
+                <!-- Блок пользователей -->
+                <div style="width: 30%; border: 1px solid #ddd; padding: 10px; background-color: #f0f8ff; border-radius: 8px;">
+                    <h4 style="text-align: center; color: #00234b;">Пользователи</h4>
+                    <table style="width: 100%;">
+                        <tbody id="lightning-users-list">
+                            {% for user in lightning.user.all %}
+                            <tr data-user-id="{{ user.id }}"> <!-- Добавляем data-user-id -->
+                                <td style="padding: 5px; border: 1px solid #ddd; background-color: #00234b; color: white; text-align: center;">
+                                    {{ user.full_name }}
+                                </td>
+                                <td style="width: 30px; text-align: center;">
+                                    <button type="button" style="background: none; border: none; color: red;" onclick="removeUserRow(this)">&#10060;</button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" style="text-align: center;">Пользователей пока нет</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button type="button" onclick="addUserRow()" style="width: 100%; margin-top: 10px;">+ Добавить пользователя</button>
+                </div>
+
+                <!-- Блок групп -->
+                <div style="width: 30%; border: 1px solid #ddd; padding: 10px; background-color: #f0f8ff; border-radius: 8px;">
+                    <h4 style="text-align: center; color: #00234b;">Группы</h4>
+                    <table style="width: 100%;">
+                        <tbody id="lightning-groups-list">
+                            {% for group in lightning.group.all %}
+                            <tr data-group-id="{{ group.id }}"> <!-- Добавляем data-group-id -->
+                                <td style="padding: 5px; border: 1px solid #ddd; background-color: #00234b; color: white; text-align: center;">
+                                    {{ group.name }}
+                                </td>
+                                <td style="width: 30px; text-align: center;">
+                                    <button type="button" style="background: none; border: none; color: red;" onclick="removeGroupRow(this)">&#10060;</button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" style="text-align: center;">Групп пока нет</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button type="button" onclick="addGroupRow()" style="width: 100%; margin-top: 10px;">+ Добавить группу</button>
+                </div>
+
+                <!-- Блок должностей -->
+                <div style="width: 30%; border: 1px solid #ddd; padding: 10px; background-color: #f0f8ff; border-radius: 8px;">
+                    <h4 style="text-align: center; color: #00234b;">Должности</h4>
+                    <table style="width: 100%;">
+                        <tbody id="lightning-job-titles-list">
+                            {% for job_title in lightning.job_titles.all %}
+                            <tr data-job-title-id="{{ job_title.id }}"> <!-- Добавляем data-job-title-id -->
+                                <td style="padding: 5px; border: 1px solid #ddd; background-color: #00234b; color: white; text-align: center;">
+                                    {{ job_title.title }}
+                                </td>
+                                <td style="width: 30px; text-align: center;">
+                                    <button type="button" style="background: none; border: none; color: red;" onclick="removeJobTitleRow(this)">&#10060;</button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" style="text-align: center;">Должностей пока нет</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button type="button" onclick="addJobTitleRow()" style="width: 100%; margin-top: 10px;">+ Добавить должность</button>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Кнопки для сохранения и удаления -->
+            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                <div>
+                    <button type="submit" class="save-button" style="margin-right: 10px;">СОХРАНИТЬ</button>
+                    {% if lightning.pk %}
+                    <!-- Удаление через стандартную форму Django -->
+                    <a href="{% url 'lightning_delete' lightning.id %}" class="delete-button">Удалить</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <p>Выберите молнию для просмотра деталей.</p>
+            {% endif %}
+        </div>
+    </div>
+</form>
+
+<script>
+    document.querySelector('.send-lightning-button').addEventListener('click', function () {
+        const lightningId = "{{ lightning.id }}";  // ID молнии из контекста
+
+        if (lightningId) {
+            fetch("/ru/send_lightning/" + lightningId + "/", {  // Используем путь с префиксом 'ru'
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',  // Для защиты от CSRF-атак
+                }
+            }).then(response => {
+                if (response.ok) {
+                    alert('Молния отправлена успешно!');
+                } else {
+                    alert('Ошибка при отправке молнии.');
+                }
+            }).catch(error => {
+                console.error('Ошибка:', error);
+            });
+        } else {
+            alert('Ошибка: Молния не выбрана.');
+        }
+    });
+</script>
+
+<script>
+    // Добавление строки с выпадающим списком для пользователей
+    function addUserRow() {
+        const userRow = `
+            <li style="padding: 5px; margin-bottom: 1px;">
+                <select name="users" style="width: 100%;">
+                    {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.full_name }}</option>
+                    {% endfor %}
+                </select>
+            </li>
+        `;
+        document.getElementById('lightning-users-list').insertAdjacentHTML('beforeend', userRow);
+    }
+
+    // Функция для удаления строки пользователя и добавления его ID в скрытое поле
+    function removeUserRow(button) {
+        const row = button.closest('tr');
+        const userId = row.getAttribute('data-user-id');  // Получаем ID пользователя из атрибута data-user-id
+        row.remove();
+
+        // Добавляем ID удаленного пользователя в скрытое поле
+        let deletedUsers = document.getElementById('deleted_users').value;
+        document.getElementById('deleted_users').value = deletedUsers ? deletedUsers + ',' + userId : userId;
+    }
+
+    // Добавление строки с выпадающим списком для групп
+    function addGroupRow() {
+        const groupRow = `
+            <li style="padding: 5px; margin-bottom: 1px;">
+                <select name="groups" style="width: 100%;">
+                    {% for group in groups %}
+                        <option value="{{ group.id }}">{{ group.name }}</option>
+                    {% endfor %}
+                </select>
+            </li>
+        `;
+        document.getElementById('lightning-groups-list').insertAdjacentHTML('beforeend', groupRow);
+    }
+
+
+    // Функция для удаления строки группы и добавления её ID в скрытое поле
+    function removeGroupRow(button) {
+        const row = button.closest('tr');
+        const groupId = row.getAttribute('data-group-id');  // Получаем ID группы из атрибута data-group-id
+        row.remove();
+
+        // Добавляем ID удаленной группы в скрытое поле
+        let deletedGroups = document.getElementById('deleted_groups').value;
+        document.getElementById('deleted_groups').value = deletedGroups ? deletedGroups + ',' + groupId : groupId;
+    }
+
+    // Добавление строки с выпадающим списком для должностей
+    function addJobTitleRow() {
+        const jobTitleRow = `
+            <li style="padding: 5px; margin-bottom: 1px;">
+                <select name="job_titles" style="width: 100%;">
+                    {% for job_title in job_titles %}
+                        <option value="{{ job_title.id }}">{{ job_title.title }}</option>
+                    {% endfor %}
+                </select>
+            </li>
+        `;
+        document.getElementById('lightning-job-titles-list').insertAdjacentHTML('beforeend', jobTitleRow);
+    }
+
+    // Функция для удаления строки должности и добавления её ID в скрытое поле
+    function removeJobTitleRow(button) {
+        const row = button.closest('tr');
+        const jobTitleId = row.getAttribute('data-job-title-id');  // Получаем ID должности из атрибута data-job-title-id
+        row.remove();
+
+        // Добавляем ID удаленной должности в скрытое поле
+        let deletedJobTitles = document.getElementById('deleted_job_titles').value;
+        document.getElementById('deleted_job_titles').value = deletedJobTitles ? deletedJobTitles + ',' + jobTitleId : jobTitleId;
+    }
+
+</script>
+
+<!-- Стили -->
+<style>
+    .vertical-divider {
+        border-left: 2px solid white;
+        min-height: 100%;
+        margin-left: 20px;
+    }
+
+    .tab-button {
+        padding: 10px 20px;
+        border: 1px solid #000;
+        border-radius: 5px;
+        cursor: pointer;
+        text-transform: uppercase;
+    }
+
+    .send-lightning-button {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        text-transform: uppercase;
+    }    
+
+    .save-button {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        text-transform: uppercase;
+    }
+
+    .delete-button {
+        background-color: #dc3545;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        text-transform: uppercase;
+        text-decoration: none;
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    li {
+        padding: 5px;
+        border: 1px solid #ddd;
+        margin-bottom: 1px;
+        background-color: #00234b;
+        color: white;
+        width: 50%;
+    }
+</style>
+
+{% endblock %}
