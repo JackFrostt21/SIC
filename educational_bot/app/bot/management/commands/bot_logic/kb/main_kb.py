@@ -23,5 +23,6 @@ def building_main_menu(user_id):
         KeyboardButton(text="Моя статистика", web_app=web_app_url_progress),  # Теперь открывает WebApp с прогрессом
         KeyboardButton(text="О боте", web_app=web_app_url_info)
     )
+    print(web_app_url_progress)
 
     return menu_keyboard

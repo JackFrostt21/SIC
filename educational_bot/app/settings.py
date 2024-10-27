@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'app.bot',
     'app.core',
     'app.educational_module',
-    'app.lightning',
     'rest_framework_swagger',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -176,22 +175,11 @@ JET_SIDE_MENU_ITEMS = [
         {'name': 'educational_module.coursedirection', 'label': _('Направления ПО')},          
         {'name': 'bot.telegramuser', 'label': _('Студенты')},
         {'name': 'bot.telegramgroup', 'label': _('Группы студентов')},
+        {'name': 'educational_module.AnswerOption', 'label': _('Тестирование')},
         #  {'name': 'bot.setslist', 'label': _('Settings_JET_MENU_ITEMS')},
         {'label': 'Статистика'}
          
      ]},
-    {'label': _('Молния:'),
-     'items': [
-        {'name': 'lightning.lightning', 'label': _('Молнии')},
-        {'name': 'lightning.jobtitle', 'label': _('Должности')},
-        {'name': 'lightning.lightningmessage', 'label': _('Сообщения молнии')},
-        {'name': 'lightning.lightningquestion', 'label': _('Вопросы молнии')},
-        {'name': 'lightning.lightninganswer', 'label': _('Варианты ответов молнии')},
-        {'name': 'bot.telegramuser', 'label': _('Пользователи')},
-        {'name': 'bot.telegramgroup', 'label': _('Группы')},
-        {'label': 'Статистика'}
-         
-     ]},    
     # {'label': _('Educational_JET_MENU_ITEMS'), 
     #  'items': [
         # {'name': 'educational_module.coursetopic', 'label': _('Разделы программы обучения')},
@@ -202,7 +190,7 @@ JET_SIDE_MENU_ITEMS = [
      'items': [
         # {'name': 'auth.user', 'label': _('Users_JET_MENU_ITEMS')},
         {'name': 'educational_module.company', 'label': _('Организации')},        
-        {'name': 'users.customuser', 'label': _('Пользователи')},
+        {'name': 'bot.telegramuser', 'label': _('Пользователи')},
         {'name': 'auth.group', 'label': _('Группы пользователей')},
         {'name': 'core.changelog', 'label': _('Логирование телеграм')},
         {'name': 'admin.logentry', 'label': _('Логирование админ-панели')},        

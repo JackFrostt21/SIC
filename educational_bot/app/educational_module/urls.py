@@ -1,6 +1,5 @@
-from rest_framework import routers
 from django.urls import path
-
+from rest_framework import routers
 
 from app.educational_module.views import (
     CourseViewSet,
@@ -10,7 +9,7 @@ from app.educational_module.views import (
     bot_info_view,
     progress_view,
     trainingcourse_custom_view,
-    TrainingCourseDeleteView,
+    TrainingCourseDeleteView
 )
 
 router = routers.DefaultRouter()
@@ -26,7 +25,6 @@ urlpatterns = [
         name="trainingcourse_custom",
     ),
     path('trainingcourses/create/', trainingcourse_custom_view, name='trainingcourse_custom_create'),
-    # path('trainingcourse/delete/<int:course_id>/', trainingcourse_delete_view, name='trainingcourse_delete'),
     path('trainingcourse/<int:pk>/delete/', TrainingCourseDeleteView.as_view(), name='trainingcourse_delete'),
     path("course_topic/<int:pk>/pdf/", PdfView.as_view(), name="course_topic_pdf"),
     path(
@@ -36,4 +34,5 @@ urlpatterns = [
     ),
     path("bot-info/", bot_info_view, name="bot_info"),
     path("progress/", progress_view, name="progress"),
+
 ]

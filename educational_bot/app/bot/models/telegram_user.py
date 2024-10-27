@@ -27,7 +27,6 @@ class TelegramUser(BaseModel, BaseRowStateModel, ChangeLoggableMixin):
     phone = models.CharField(
         max_length=20, verbose_name="Телефон", blank=True, null=True, unique=True
     )
-    job_title = models.ForeignKey('lightning.JobTitle', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Должность')
     company = models.ForeignKey(Company, on_delete=models.CASCADE, verbose_name=_('Компания'),null=True, blank=True)
     language = models.CharField(
         max_length=20, verbose_name="Язык", blank=True, null=True
@@ -74,7 +73,6 @@ class TelegramUser(BaseModel, BaseRowStateModel, ChangeLoggableMixin):
 
 
 class TelegramGroup(ChangeLoggableMixin, models.Model):
-    lightning_group = models.BooleanField(default=False, verbose_name='Группа для молний')
     name = models.CharField(max_length=100, verbose_name="Наименование группы")
     description = models.TextField(blank=True, null=True, verbose_name="Описание")
     users = models.ManyToManyField(TelegramUser, blank=True, related_name="Пользователи")

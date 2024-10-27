@@ -22,16 +22,12 @@ from app.bot.management.commands.bot_logic.lang_middleware import setup_middlewa
 from app.bot.management.commands.bot_logic.states import LocaleRegSteps
 from app.bot.management.commands.loader import dp
 
-from app.bot.models.telegram_user import UserAction, TelegramUser, TelegramGroup
+from app.bot.models.telegram_user import UserAction, TelegramUser
 from app.bot.management.commands.bot_logic.kb.main_kb import building_main_menu
-from app.bot.management.commands.bot_logic.kb.lightning_kb import building_main_menu_lightning
 
 i18n = setup_middleware(dp)
 _ = i18n.gettext
 
-@sync_to_async
-def is_user_in_lightning_group(user_id):
-    return TelegramGroup.objects.filter(lightning_group=True, users__id=user_id).exists()
 
 @sync_to_async
 def get_telegram_user(user_id):
@@ -46,22 +42,16 @@ async def show_main_menu(message: types.Message):
     if not user:
         await message.answer("Пользователь не найден в базе данных.")
         return
-    # Проверка, состоит ли пользователь хотя бы в одной группе с флагом lightning_group=True
-    lightning_group_exists = await is_user_in_lightning_group(user.id)
 
-    if lightning_group_exists:
-        # Если пользователь состоит в группе для молний, выводим клавиатуру "Молнии"
-        menu_keyboard = await building_main_menu_lightning(user.id)
-    else:
-        # Иначе выводим стандартную клавиатуру для бота по обучению
-        menu_keyboard = await building_main_menu(user.id)
+    # Используем данные из модели вместо данных из message.from_user
+    first_name = user.first_name if user.first_name else "Имя не указано"
+    middle_name = user.middle_name if user.middle_name else " "
 
     # Логотип и меню
     title, content, photo = await load_bot_logo("main_menu_logo", message.from_user.id)
+    menu_keyboard = await building_main_menu(message.from_user.id)
     media = types.InputFile(photo)
 
-    first_name = user.first_name if user.first_name else "Имя не указано"
-    middle_name = user.middle_name if user.middle_name else " "
 
     await message.answer_photo(
         photo=media,

@@ -37,7 +37,6 @@ class LocaleRegSteps(StatesGroup):
     enter_email = State()
     registration_finish = State()
     select_company = State()
-    job_title = State()
 
 
 class FeedbackSave(StatesGroup):

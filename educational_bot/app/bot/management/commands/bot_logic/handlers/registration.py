@@ -4,7 +4,6 @@ from asgiref.sync import sync_to_async
 import re
 
 from app.bot.management.commands.bot_logic.kb.main_kb import building_main_menu
-from app.bot.management.commands.bot_logic.kb.lightning_kb import building_main_menu_lightning
 from app.bot.management.commands.loader import dp
 from app.bot.management.commands.bot_logic.lang_middleware import setup_middleware
 from app.bot.management.commands.bot_logic.functions import user_set_language, load_bot_logo
@@ -14,7 +13,6 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemo
 
 from app.bot.models.telegram_user import TelegramUser
 from app.educational_module.models import Company
-from app.lightning.models import JobTitle
 
 i18n = setup_middleware(dp)
 _ = i18n.gettext
@@ -69,7 +67,7 @@ async def set_language(message: types.Message):
             case '🇬🇧English':
                 await user_set_language(message.from_user.id, 'en')
                 await message.answer(text='Please share your name', reply_markup=ReplyKeyboardRemove())
-        await LocaleRegSteps.enter_full_name.set()
+        await LocaleRegSteps.enter_date_birth.set()
     except Exception as e:
         print(e)
 
@@ -79,12 +77,12 @@ async def set_language(message: types.Message):
 Он сохраняет имя в состоянии FSM и отправляет сообщение с запросом даты рождения, 
 затем обновляет состояние на LocaleRegSteps.enter_phone.
 """
-@dp.message_handler(state=LocaleRegSteps.enter_full_name)
+@dp.message_handler(state=LocaleRegSteps.enter_date_birth)
 async def enter_date_birth(message: types.Message, state: FSMContext):
     try:
         await state.update_data(name=message.text)
         await message.answer(text=_('Please enter date_of_birth'), reply_markup=ReplyKeyboardRemove())
-        await LocaleRegSteps.enter_date_birth.set()
+        await LocaleRegSteps.enter_phone.set()
     except Exception as e:
         print(e)
 
@@ -95,7 +93,7 @@ async def enter_date_birth(message: types.Message, state: FSMContext):
 предоставляя пользователю клавиатуру для отправки контакта. 
 Затем состояние обновляется на LocaleRegSteps.registration_finish.
 """
-@dp.message_handler(state=LocaleRegSteps.enter_date_birth)
+@dp.message_handler(state=LocaleRegSteps.enter_phone)
 async def enter_phone(message: types.Message, state: FSMContext):
     try:
         await state.update_data(birth=message.text)
@@ -103,7 +101,7 @@ async def enter_phone(message: types.Message, state: FSMContext):
         kb.add(KeyboardButton(_('Share contact'), request_contact=True))
 
         await message.answer(text=_('Please enter share contact'), reply_markup=kb)
-        await LocaleRegSteps.enter_phone.set()
+        await LocaleRegSteps.registration_finish.set()
     except Exception as e:
         print(e)
 
@@ -115,7 +113,7 @@ async def enter_phone(message: types.Message, state: FSMContext):
 Затем загружает логотип бота, создаёт главное меню и отправляет пользователю фото с сообщением, 
 подтверждающим успешную регистрацию. После этого состояние сбрасывается.
 """
-@dp.message_handler(content_types=types.ContentType.ANY, state=LocaleRegSteps.enter_phone)
+@dp.message_handler(content_types=types.ContentType.ANY, state=LocaleRegSteps.registration_finish)
 async def registration_finish(message: types.Message, state: FSMContext):
     try:
         if message.contact:
@@ -128,8 +126,7 @@ async def registration_finish(message: types.Message, state: FSMContext):
         phone = data.get('phone')
         await user_set_info(message.from_user.id, enter_full_name, date_birth, phone)
         title, content, photo = await load_bot_logo('welcome_logo', message.from_user.id)
-        # menu_keyboard = await building_main_menu(message.from_user.id)
-        menu_keyboard = await building_main_menu_lightning(message.from_user.id)
+        menu_keyboard = await building_main_menu(message.from_user.id)
         media = types.InputFile(photo)
         await message.answer_photo(photo=media,
                                    caption=f'{title}\n'

@@ -10,7 +10,6 @@ from app.bot.management.commands.bot_logic.handlers.callbackhandlers.settings_lo
 # from app.bot.management.commands.bot_logic.kb.test_kb import training_course_menu_kb_generator
 from app.bot.management.commands.bot_logic.lang_middleware import setup_middleware
 from app.bot.management.commands.loader import dp, bot
-from app.bot.management.commands.bot_logic.kb.lightning_kb import lightning_menu_kb_generator, create_date_filter_kb
 
 i18n = setup_middleware(dp)
 _ = i18n.gettext
@@ -53,14 +52,6 @@ async def main_menu(message: types.Message):
         #                                    parse_mode='HTML')
         #     else:
         #         await message.answer(text=res)
-        if message.text == 'Молнии':
-            user = await user_get_tools(message.from_user.id)
-            kb = await create_date_filter_kb(user.id)
-
-            if kb:
-                await message.answer('Выберите период:', reply_markup=kb)
-            else:
-                await message.answer('Нет доступных молний')
 
         if message.text == _('Settings'):
             kb = kb_settings((await user_get_tools(message.from_user.id)).language)
@@ -81,7 +72,7 @@ async def main_menu(message: types.Message):
                                          types.InlineKeyboardButton(text=_('btn_close'),
                                                                     callback_data='btn_done')
                                      ))
-        menu_list = [_('self-study'), _('testing'), _('Settings'), 'О боте', 'Молнии']
+        menu_list = [_('self-study'), _('testing'), _('Settings'), 'О боте']
         if message.text not in menu_list and not _('self-progress') in message.text and not message.via_bot:
             await bot.send_message(message.from_user.id, message.text)
             await message.answer(text=f'❌!Error!❌ \nCommand not found. Press -> /start')
