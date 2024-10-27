@@ -1,0 +1,147 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    color: #b9b6b6;
+
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #00234b;
+
+}
+
+.container {
+    display: flex;
+    flex: 1;
+}
+
+.sidebar {
+    width: 25%;
+    background-color: #00234b;
+    padding: 10px;
+    border-right: 1px solid #ccc;
+}
+
+.logo {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.question-list {
+    list-style-type: none;
+    margin: 10px 0;
+}
+
+.question-list li {
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.add-question {
+    margin-top: 10px;
+    padding: 5px;
+    width: 100%;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.note {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #555;
+}
+
+.content {
+    width: 75%;
+    padding: 20px;
+}
+
+.form-group {
+    margin-top: 20px;
+}
+
+.checkbox-group {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 10px;
+}
+
+.input-group {
+    margin-bottom: 10px;
+}
+
+.answers-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.answers-table th, .answers-table td {
+    border: 1px solid #ccc;
+    padding: 5px;
+    text-align: center;
+}
+
+.add-answer {
+    margin-top: 10px;
+    padding: 5px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.save-button {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.footer {
+    background-color: #2c3e50;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 12px;
+}
+
+.question-item.selected {
+    background-color: #4CAF50; /* Цвет фона для выделенного вопроса */
+    color: #00796b; /* Цвет текста для выделенного вопроса */
+}
+
+.input-group input[type="text"] {
+    width: 100%; /* Устанавливает ширину на 100% от родительского контейнера */
+    height: 50px; /* Устанавливает высоту поля ввода */
+    font-size: 16px; /* Устанавливает размер шрифта */
+    padding: 10px; /* Добавляет внутренние отступы */
+    box-sizing: border-box; /* Учитывает отступы и границы в общей ширине и высоте */
+}
+
+
+.input-group input[type="text"] {
+    width: 100%; /* Устанавливает ширину на 100% от родительского контейнера */
+    height: 50px; /* Устанавливает высоту поля ввода */
+    font-size: 16px; /* Устанавливает размер шрифта */
+    padding: 10px; /* Добавляет внутренние отступы */
+    box-sizing: border-box; /* Учитывает отступы и границы в общей ширине и высоте */
+}
+
+textarea {
+    width: 100%; /* Ширина текстового поля */
+    height: 100px; /* Высота текстового поля */
+    resize: vertical; /* Позволяет изменять размер только по вертикали */
+    padding: 10px; /* Внутренние отступы */
+    border: 1px solid #ccc; /* Цвет границы */
+    border-radius: 4px; /* Закругление углов */
+}
