@@ -196,7 +196,7 @@ def trainingcourse_custom_view(request, course_id=None):
 
 class TrainingCourseDeleteView(DeleteView):
     model = TrainingCourse
-    template_name = 'courses/trainingcourse_confirm_delete.html'
+    template_name = 'courses/groups_confirm_delete.html'
     success_url = reverse_lazy('trainingcourse_custom')
 
 
@@ -262,3 +262,77 @@ def save_answer_view(request, question_id):
         return JsonResponse({'status': 'success'}, status=200)
 
     return JsonResponse({'status': 'failed'}, status=400)
+
+'----------------------------------ERIELL dev--------------------------------------'
+
+def groups_custom_view(request):
+    groups = TelegramGroup.objects.all()
+    selected_group = None
+    selected_group_students = []
+
+    # Получаем выбранную группу
+    group_id = request.GET.get('group_id')
+    if group_id:
+        selected_group = get_object_or_404(TelegramGroup, id=group_id)
+        selected_group_students = selected_group.users.all()
+
+    # Получаем студентов, не принадлежащих к группе
+    if selected_group:
+        students = TelegramUser.objects.exclude(id__in=selected_group.users.all())
+    else:
+        students = TelegramUser.objects.all()
+
+    # Сохраняем изменения при нажатии кнопки "Сохранить"
+    if request.method == "POST" and selected_group:
+        student_ids = request.POST.get('student_ids')
+        if student_ids:
+            student_ids_list = student_ids.split(',')
+
+            # Если student_ids не пуст, то проверяем и добавляем студентов
+            if request.POST.get('action') == 'add':
+                for student_id in student_ids_list:
+                    student = get_object_or_404(TelegramUser, id=student_id)
+                    selected_group.users.add(student)  # Добавляем студента в группу
+            elif request.POST.get('action') == 'remove':
+                for student_id in student_ids_list:
+                    student = get_object_or_404(TelegramUser, id=student_id)
+                    selected_group.users.remove(student)  # Удаляем студента из группы
+
+        return redirect(f"{request.path}?group_id={selected_group.id}")
+
+    return render(request, 'groups/groups_custom.html', {
+        'groups': groups,
+        'students': students,
+        'selected_group': selected_group,
+        'selected_group_students': selected_group_students,
+    })
+
+def add_student_to_group(request):
+    if request.method == 'POST':
+        student_id = request.POST.get('student_id')
+        group_id = request.POST.get('group_id')
+
+        try:
+            student = TelegramUser.objects.get(id=student_id)
+            group = TelegramGroup.objects.get(id=group_id)
+            group.users.add(student)
+            return JsonResponse({'success': True})
+        except (TelegramUser.DoesNotExist, TelegramGroup.DoesNotExist):
+            return JsonResponse({'success': False, 'error': 'Student or group not found'})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+def remove_student_from_group(request):
+    if request.method == 'POST':
+        student_id = request.POST.get('student_id')
+        group_id = request.POST.get('group_id')
+
+        try:
+            student = TelegramUser.objects.get(id=student_id)
+            group = TelegramGroup.objects.get(id=group_id)
+            group.users.remove(student)
+            return JsonResponse({'success': True})
+        except (TelegramUser.DoesNotExist, TelegramGroup.DoesNotExist):
+            return JsonResponse({'success': False, 'error': 'Student or group not found'})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})

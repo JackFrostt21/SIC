@@ -175,6 +175,7 @@ JET_SIDE_MENU_ITEMS = [
         {'name': 'educational_module.coursedirection', 'label': _('Направления ПО')},          
         {'name': 'bot.telegramuser', 'label': _('Студенты')},
         {'name': 'bot.telegramgroup', 'label': _('Группы студентов')},
+        {'url': '/api/testing-testing_module/groups/', 'label': _('Группы НОВЫЕ')},
         {'name': 'educational_module.AnswerOption', 'label': _('Тестирование')},
         #  {'name': 'bot.setslist', 'label': _('Settings_JET_MENU_ITEMS')},
         {'label': 'Статистика'}

@@ -9,7 +9,10 @@ from app.educational_module.views import (
     bot_info_view,
     progress_view,
     trainingcourse_custom_view,
-    TrainingCourseDeleteView
+    TrainingCourseDeleteView,
+    groups_custom_view,
+    add_student_to_group,
+    remove_student_from_group,
 )
 
 router = routers.DefaultRouter()
@@ -34,5 +37,7 @@ urlpatterns = [
     ),
     path("bot-info/", bot_info_view, name="bot_info"),
     path("progress/", progress_view, name="progress"),
-
+    path("groups/", groups_custom_view, name="groups_custom"),
+    path('add-student-to-group/', add_student_to_group, name='add_student_to_group'),
+    path('remove-student-from-group/', remove_student_from_group, name='remove_student_from_group'),
 ]
