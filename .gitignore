@@ -7,3 +7,4 @@ db.sqlite3
 educational_bot_prod.sql
 cert.pem
 key.pem
+my_env
