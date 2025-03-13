@@ -3,6 +3,7 @@
 .env
 .groosha
 .studentbot
+.djbalak
 db.sqlite3
 educational_bot_prod.sql
 cert.pem
