@@ -1,0 +1,164 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<div style="display: flex; min-height: 100vh; align-items: stretch;">
+    <!-- Левый блок - Список направлений (сайдбар) -->
+    <div style="width: 10%; min-width: 200px; padding-right: 10px; box-sizing: border-box;">
+        <button type="button" 
+            onclick="window.location.href='{% url 'coursedirection_create' %}'" 
+            style="width: 100%; padding: 10px; margin-top: 10px; 
+                    background-color: #28a745; color: #ffffff; border: none; 
+                    border-radius: 3px; cursor: pointer; text-transform: uppercase; 
+                    font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                    Создать направление программы
+        </button>
+        <h2 style="color: #ffffff; text-align: center; margin-bottom: 15px;">Направления программы:</h2>
+
+        <!-- Форма поиска направления -->
+        <form method="GET" style="margin-bottom: 15px;">
+            <label for="search-coursedirection" style="color: #ffffff;">Поиск по направлениям:</label>
+            <input type="text" name="search" id="search-coursedirection" 
+                value="{{ search_query }}" 
+                placeholder="Введите название..." 
+                style="width: 100%; padding: 5px; margin-top: 5px; box-sizing: border-box;">
+            <button type="submit" style="width: 100%; padding: 5px; margin-top: 5px; 
+                                        background-color: #007bff; color: #ffffff; 
+                                        border: none; border-radius: 3px; 
+                                        cursor: pointer; text-transform: uppercase; 
+                                        font-size: 14px;">
+                Искать
+            </button>
+        </form>
+
+        <ul style="list-style: none; padding: 0; margin: 0;">
+            {% for coursedirection in coursedirections %}
+            <li style="margin-bottom: 10px; width: 100%; box-sizing: border-box;">
+                <a href="{% url 'coursedirection_detail' coursedirection.id %}" 
+                style="display: block; padding: 10px; background-color: #1a3c5d; color: #ffffff; 
+                        text-decoration: none; border-radius: 3px; text-align: center; 
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.2); width: 100%; box-sizing: border-box;">
+                    {{ coursedirection.title }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Разделяющая вертикальная линия -->
+    <div style="border-left: 2px solid #ddd; min-height: 100%; margin-left: -2px;"></div>
+
+    <!-- Правый блок - Информация о выбранном направлении -->
+    <div style="width: 70%; padding-left: 20px;">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if coursedirection or is_create %}
+            <h2 style="text-align: center;">Направление программы обучения: {{ coursedirection.title }}</h2>
+            <hr style="border: 1px solid black;" />
+            <!-- Информация о направлении -->
+            <div style="display: flex; justify-content: space-between;">
+                <div style="width: 75%; padding-right: 10px;">
+                    <p>
+                        <strong>Направление программы обучения:</strong> 
+                        <input type="text" name="title" value="{{ coursedirection.title }}">
+                    </p>
+                </div>
+            </div>
+            <!-- Кнопки для настройки тестирования, сохранения и удаления -->
+            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                <div>
+                    <button type="submit" class="save-button" style="margin-right: 10px;">СОХРАНИТЬ</button>
+                    {% if coursedirection.pk %}
+                    <!-- Удаление через стандартную форму Django -->
+                    <a href="{% url 'coursedirection_delete' coursedirection.id %}" class="delete-button">Удалить</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <p>Выберите направление программы обучения для просмотра деталей.</p>
+            {% endif %}
+        </form> 
+    </div>
+</div>
+
+<!-- Стили -->
+<style>
+    .vertical-divider {
+        border-left: 2px solid white;
+        min-height: 100%;
+        margin-left: 20px;
+    }
+
+    .description-field {
+        width: 50%;
+        height: 100px;
+        resize: none;
+    }
+
+    .save-button {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        text-transform: uppercase;
+    }
+
+    .save-button:hover {
+        background-color: #218838;
+    }
+
+    .save-button:active {
+        background-color: #1e7e34;
+    }
+
+    .delete-button {
+        background-color: #dc3545;
+        color: white !important;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        text-transform: uppercase;
+        text-decoration: none;
+    }
+
+    .delete-button:hover {
+        background-color: #c82333;
+    }
+
+    .delete-button:active {
+        background-color: #bd2130;
+    }
+
+    /* Стили для блоков разделов, студентов и групп */
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    li {
+        padding: 5px;
+        border: 1px solid #ddd;
+        margin-bottom: 1px;
+        background-color: #00234b;
+        color: white;
+        width: 50%;
+    }
+
+    button {
+        margin-top: 10px;
+        padding: 5px 10px;
+    }
+
+    /* Добавляем перенос длинных слов в ссылках */
+    a {
+        word-wrap: break-word;
+        word-break: break-word;
+        white-space: normal;
+    }
+</style>
+
+{% endblock %}

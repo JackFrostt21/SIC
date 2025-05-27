@@ -1,0 +1,55 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+  <h2>Подтверждение удаления</h2>
+  <p>Вы уверены, что хотите удалить раздел "{{ object.title }}"?</p>
+  
+  <form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="delete-button">Удалить</button>
+    <a href="{% url 'coursetopic_custom' object.id %}" class="save-button">Отмена</a>
+  </form>
+{% endblock %}
+
+<!-- Стили для кнопок -->
+<style>
+    .delete-button {
+        background-color: #dc3545;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        text-transform: uppercase;
+        text-decoration: none;
+    }
+
+    .delete-button:hover {
+        background-color: #c82333;
+    }
+
+    .delete-button:active {
+        background-color: #bd2130;
+    }
+
+    .save-button {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        text-transform: uppercase;
+        text-decoration: none;
+    }
+
+    .save-button:hover {
+        background-color: #218838;
+    }
+
+    .save-button:active {
+        background-color: #1e7e34;
+    }
+</style>

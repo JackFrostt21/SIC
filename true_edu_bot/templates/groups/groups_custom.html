@@ -1,0 +1,247 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/groups_style.css' %}">
+    
+<div class="horizontal-divider" style="height: 1px; background-color: #ddd; margin-bottom: 0px; width: 100%;"></div>
+
+<div class="row_all">
+    <div class="col-md-4 groups">
+        <h3 class="groups_title">Выберите группу:</h3>
+        <ul class="group_list">
+            {% for group in groups %}
+                <li class="groups_list_item">
+                    <a href="?group_id={{ group.id }}">{{ group.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    
+    <div class="create_group">
+        <h3 class="create_group_title">Создать группу:</h3>
+        <input class="create_group_input" type="text" id="newGroupName" placeholder="Введите название" />
+        <button class="create_group_btn" onclick="createGroup()">Создать</button>
+    </div>
+</div>
+
+    <div class="vertical-divider" style="width: 1px; background-color: #ddd; height: 1000px; margin-top: 0px;"></div>
+
+    <div class="group_selected" data-group-id="{{ selected_group.id }}">
+        <div class="table_row_title">
+            <h4 class="table_row_title_group">
+                Выбранная группа: 
+                <input class="table_row_title_group_input" type="text" id="groupNameInput" value="{{ selected_group.name|default:'' }}" />
+            </h4>
+            <label class="lightning-group-label">
+                <input type="checkbox" id="lightningGroupCheckbox" name="lightning_group" {% if selected_group.lightning_group %}checked{% endif %}>
+                <p class="group_molniya_text">Группа для молний</p>
+            </label>
+            <button class="table_row_title_group_btn" onclick="saveGroupName()">Сохранить</button>
+            <button class="table_row_title_group_btn" onclick="DeleteGroup()">Удалить</button>
+        </div>
+        
+        <div class="table_row_users">
+            <div class="col-md-4 users">
+                <h3 class="table_row_users_title">Доступные пользователи</h3>
+                {% if selected_group %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add">
+                        <ul class="users_list">
+                            {% for student in students %}
+                                <li class="users_list_item" data-id="{{ student.id }}" tabindex="0" onclick="addStudent('{{ student.id }}')">
+                                    <span class="user_link_span">
+                                        {{ student.full_name }}
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <button type="submit" class="btn btn-add_users">Добавить</button>
+                        <input type="hidden" name="student_ids" id="student_ids" value="" />
+                    </form>
+                {% else %}
+                    <p>Выберите группу, чтобы увидеть доступных пользователей.</p>
+                {% endif %}
+            </div>
+
+            <div class="col-md-4 added_users">
+                <h3 class="table_row_users_title">Пользователи в группе</h3>
+                {% if selected_group %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="remove">
+                        <ul class="added_users_list">
+                            {% for student in selected_group_students %}
+                                <li class="added_users_list_item" data-id="{{ student.id }}" onclick="toggleStudent({{ student.id }})">
+                                    <a class="user_link">
+                                        {{ student.full_name }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <input type="hidden" name="student_ids" id="student-ids" value="">
+                        <button type="submit" class="btn btn-delete">Удалить</button>
+                    </form>
+                {% else %}
+                    <p>Выберите группу, чтобы увидеть её пользователей.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+function toggleStudent(studentId) {
+    // Ensure studentId is treated as a string
+    studentId = studentId.toString();
+
+    // Get the current list of student IDs from the hidden input field
+    let currentIds = document.getElementById('student-ids').value;
+    let idArray = currentIds ? currentIds.split(',') : [];
+    
+    // Select the user item element based on data-id attribute
+    const userItem = document.querySelector(`.added_users_list_item[data-id="${studentId}"]`);
+
+    if (idArray.includes(studentId)) {
+        // If the student ID is in the list, remove it and remove the highlight
+        idArray = idArray.filter(id => id !== studentId);
+        if (userItem) {
+            userItem.classList.remove('highlight2'); // Remove highlight class
+        }
+    } else {
+        // If the student ID is not in the list, add it and add the highlight
+        idArray.push(studentId);
+        if (userItem) {
+            userItem.classList.add('highlight2'); // Add highlight class
+        }
+    }
+
+    // Update the hidden input field with the selected student IDs
+    document.getElementById('student-ids').value = idArray.join(',');
+    
+    console.log("Student ID:", studentId);
+console.log("User Item:", userItem);
+}
+
+let studentIds = [];
+
+function addStudent(studentId) {
+    const userItem = document.querySelector(`.users_list_item[data-id="${studentId}"]`);
+
+    if (!studentIds.includes(studentId)) {
+        studentIds.push(studentId);
+        userItem.classList.add('highlight'); // Add highlight class if student is added
+    } else {
+        // If the student ID already exists, remove it and remove the highlight
+        studentIds = studentIds.filter(id => id !== studentId);
+        userItem.classList.remove('highlight'); // Remove highlight class if student is removed
+    }
+
+    document.getElementById('student_ids').value = studentIds.join(',');
+}
+
+function saveGroupName() {
+    const groupNameInput = document.getElementById("groupNameInput");
+    const lightningGroupCheckbox = document.getElementById("lightningGroupCheckbox");
+    
+    if (groupNameInput && "{{ selected_group|default:None }}" !== "None") {
+        const groupName = groupNameInput.value;
+        const isLightningGroup = lightningGroupCheckbox.checked;
+        
+        const updateUrl = "{% if selected_group %}{% url 'update_group_name' selected_group.id %}{% else %}#{% endif %}";
+
+        if (updateUrl !== "#") {
+            fetch(updateUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                body: JSON.stringify({ 
+                    name: groupName, 
+                    lightning_group: isLightningGroup 
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("Группа успешно обновлена!");
+                } else {
+                    alert("Ошибка при обновлении группы.");
+                }
+            })
+            .catch(error => console.error("Ошибка:", error));
+        } else {
+            console.log("Выбранная группа отсутствует.");
+        }
+    } else {
+        console.log("Input отсутствует или выбранная группа отсутствует.");
+    }
+}
+
+
+function createGroup() {
+    const groupName = document.getElementById("newGroupName").value;
+
+    if (groupName.trim() === "") {
+        alert("Пожалуйста, введите название группы.");
+        return;
+    }
+
+    fetch("{% url 'create_group' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}",
+        },
+        body: JSON.stringify({ name: groupName })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            alert("Группа успешно создана!");
+            location.reload(); // Перезагрузка страницы для обновления списка групп
+        } else {
+            alert("Ошибка при создании группы.");
+        }
+    })
+    .catch(error => console.error("Ошибка:", error));
+}
+
+function DeleteGroup() {
+    // Получаем ID группы из data-group-id
+    const groupId = document.querySelector(".group_selected").dataset.groupId;
+
+    if (!groupId) {
+        alert("Группа не выбрана.");
+        return;
+    }
+
+    const groupName = document.getElementById("groupNameInput").value;
+
+    if (confirm(`Вы уверены, что хотите удалить группу "${groupName}"?`)) {
+        fetch("{% url 'delete_group' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body: JSON.stringify({ id: groupId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                alert("Группа успешно удалена!");
+                // Используем базовый URL для формирования полной ссылки
+                const baseUrl = window.location.origin;
+                window.location.href = `${baseUrl}/api/testing-testing_module/groups/`;
+            } else {
+                alert(`Ошибка: ${data.message}`);
+            }
+        })
+        .catch(error => console.error("Ошибка:", error));
+    }
+}
+
+
+</script>
+{% endblock %}

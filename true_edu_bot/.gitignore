@@ -1,0 +1,5 @@
+.env
+cert.pem
+key.pem
+db.sqlite3
+.edubot

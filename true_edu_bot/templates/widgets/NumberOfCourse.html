@@ -1,0 +1,41 @@
+<div>
+    <h5 style="padding-left: 50px">Курсы и количество пользователей:</h5>
+    <canvas id="CoursesChart" width="400" height="250"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Создаем массивы с метками и данными напрямую
+    const labelsNumberOfCourse = [{% for course in courses %}"{{ course.course_name }}"{% if not forloop.last %}, {% endif %}{% endfor %}];
+    const totalCounts = [{% for course in courses %}{{ course.total_user_count }}{% if not forloop.last %}, {% endif %}{% endfor %}];
+
+    const ctxNumberOfCourse = document.getElementById('CoursesChart').getContext('2d');
+    const dataNumberOfCourse = {
+        labels: labelsNumberOfCourse,
+        datasets: [
+            {
+                type: 'bar',
+                label: 'Количество пользователей',
+                data: totalCounts,
+                backgroundColor: 'rgba(13,122,159,0.7)',
+                borderColor: 'rgba(13,122,159,1)',
+                borderWidth: 1
+            }
+        ]
+    };
+
+    const configNumberOfCourse = {
+        type: 'bar',
+        data: dataNumberOfCourse,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    };
+
+    new Chart(ctxNumberOfCourse, configNumberOfCourse);
+</script>

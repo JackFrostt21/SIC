@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>PDF Viewer</title>
+    <link rel="stylesheet" href="{% static 'pdfjs/viewer.css' %}">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+            overflow: hidden;
+        }
+        #pdf-viewer {
+            width: 100%;
+            height: 100%;
+            overflow: auto; /* Для скроллинга при увеличении масштаба */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        canvas {
+            display: block;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="pdf-viewer"></div>
+    <script type="module">
+        // Импортируем библиотеку PDF.js
+        import * as pdfjsLib from '{% static "pdfjs/pdf.mjs" %}';
+
+        // Указываем путь к воркеру
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '{% static "pdfjs/pdf.worker.mjs" %}';
+
+        const url = "{{ pdf_url }}"; // Путь к PDF файлу
+        const viewer = document.getElementById('pdf-viewer');
+
+        // Создаем canvas
+        const canvas = document.createElement('canvas');
+        viewer.appendChild(canvas);
+        const context = canvas.getContext('2d');
+
+        // Функция для рендера PDF с адаптацией под размер окна
+        function renderPDFToFitWindow(pdf, pageNumber = 1, scale = null) {
+            pdf.getPage(pageNumber).then(page => {
+                const viewport = page.getViewport({ scale: scale || 1 });
+
+                // Если масштаб не задан, рассчитываем его
+                if (!scale) {
+                    const containerWidth = viewer.clientWidth;
+                    const containerHeight = viewer.clientHeight;
+                    const pdfAspectRatio = viewport.width / viewport.height;
+
+                    scale = Math.min(
+                        containerWidth / viewport.width,
+                        containerHeight / viewport.height
+                    );
+                }
+
+                const scaledViewport = page.getViewport({ scale });
+                canvas.width = scaledViewport.width;
+                canvas.height = scaledViewport.height;
+
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: scaledViewport,
+                };
+
+                page.render(renderContext);
+            });
+        }
+
+        // Загружаем PDF и рендерим первую страницу
+        pdfjsLib.getDocument(url).promise.then(pdf => {
+            let currentScale = null; // Масштаб по умолчанию
+            renderPDFToFitWindow(pdf); // Первичная подгонка
+
+            // Добавляем возможность увеличения и уменьшения масштаба с помощью клавиш
+            window.addEventListener('keydown', (event) => {
+                if (event.key === '+' || event.key === '=') {
+                    currentScale = (currentScale || 1) + 0.1; // Увеличение масштаба
+                } else if (event.key === '-') {
+                    currentScale = (currentScale || 1) - 0.1; // Уменьшение масштаба
+                }
+                if (currentScale) renderPDFToFitWindow(pdf, 1, currentScale);
+            });
+
+            // Добавляем поддержку жестов для масштабирования
+            let pinchScale = null;
+            viewer.addEventListener('wheel', (event) => {
+                if (event.ctrlKey) {
+                    // Используем колесо мыши с `Ctrl` для масштабирования
+                    currentScale = (currentScale || 1) + (event.deltaY < 0 ? 0.1 : -0.1);
+                    if (currentScale) renderPDFToFitWindow(pdf, 1, currentScale);
+                    event.preventDefault();
+                }
+            });
+        }).catch(error => {
+            console.error('Ошибка при загрузке PDF:', error);
+        });
+    </script>
+</body>
+</html>

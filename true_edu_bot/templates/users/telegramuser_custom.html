@@ -1,0 +1,456 @@
+{% extends 'admin/base.html' %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <!-- Подключение jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Подключение Inputmask -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.7/inputmask.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div style="display: flex; min-height: 100vh; align-items: stretch;">
+    <!-- Левый блок - Список пользователей (сайдбар) -->
+    <div style="width: 10%; min-width: 200px; padding-right: 10px; box-sizing: border-box;">
+        <button type="button" 
+        onclick="window.location.href='{% url 'telegramuser_custom_create' %}'" 
+        style="width: 100%; padding: 10px; margin-top: 10px; 
+                background-color: #28a745; color: #ffffff; border: none; 
+                border-radius: 3px; cursor: pointer; text-transform: uppercase; 
+                font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                Создать Пользователя
+        </button>
+        <h2 style="color: #ffffff; text-align: center; margin-bottom: 15px;">Пользователи:</h2>
+
+        <!-- Форма поиска пользователей -->
+        <form method="GET" style="margin-bottom: 15px;">
+            <label for="search-teleuser" style="color: #ffffff;">Поиск по студентам:</label>
+            <input type="text" name="search" id="search-teleuser" 
+                value="{{ search_query }}" 
+                placeholder="Введите название..." 
+                style="width: 100%; padding: 5px; margin-top: 5px; box-sizing: border-box;">
+            <button type="submit" style="width: 100%; padding: 5px; margin-top: 5px; 
+                                        background-color: #007bff; color: #ffffff; 
+                                        border: none; border-radius: 3px; 
+                                        cursor: pointer; text-transform: uppercase; 
+                                        font-size: 14px;">
+                Искать
+            </button>
+        </form>
+
+        <ul style="list-style: none; padding: 0; margin: 0;">
+            {% for teleuser in teleusers %}
+            <li style="margin-bottom: 10px; width: 100%; box-sizing: border-box;">
+                <a href="{% url 'telegramuser_custom' teleuser.id %}" 
+                style="display: block; padding: 10px; background-color: #1a3c5d; color: #ffffff; 
+                        text-decoration: none; border-radius: 3px; text-align: center; 
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.2); width: 100%; box-sizing: border-box;">
+                    {{ teleuser.full_name }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+    <!-- Разделяющая вертикальная линия -->
+    <div style="border-left: 2px solid #ddd; min-height: 100%; margin-left: -2px;"></div>
+
+    <!-- Правый блок - Информация о пользователе -->
+    <div style="width: 70%; padding-left: 20px;">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if teleuser %}
+            <!-- Заголовок по центру -->
+            <h2 style="text-align: center;">Пользователь: {{ teleuser.full_name }}</h2>
+            <hr style="border: 1px solid black;" />
+
+            <!-- Информация о пользователе -->
+            <div style="display: flex; justify-content: space-between;">
+                <div style="width: 75%; padding-right: 10px;">
+
+                    <p>
+                        <strong>Статус:</strong>
+                        <select name="state">
+                            {% for state_value, state_label in state_choices %}
+                            <option value="{{ state_value }}" {% if teleuser.state == state_value %}selected{% endif %}>
+                                {{ state_label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </p>
+                    <p>
+                        <strong>Telegram ID:</strong>
+                        <input type="text" name="user_id" value="{{ teleuser.user_id }}">
+                    </p>
+                    <p>
+                        <strong>Telegram username:</strong>
+                        <input type="text" name="user_name" value="{{ teleuser.user_name }}">
+                    </p>
+                    <p>
+                        <strong>Телефон:</strong>
+                        <input type="text" name="phone" value="{{ teleuser.phone }}" placeholder="+7(___)___-__-__">
+                        {% if teleuser.phone and teleuser.phone|length < 16 %}
+                            <span class="error">Некорректный формат телефона.</span>
+                        {% endif %}
+                    </p>
+                    <p>
+                        <strong>Email:</strong>
+                        <input type="text" name="email" value="{{ teleuser.email }}">
+                    </p>
+                    <p>
+                        <strong>ФИО:</strong>
+                        <input type="text" name="full_name" value="{{ teleuser.full_name }}">
+                    </p>
+                    <p>
+                        <strong>Фамилия:</strong>
+                        <input type="text" name="last_name" value="{{ teleuser.last_name }}">
+                    </p>
+                    <p>
+                        <strong>Имя:</strong>
+                        <input type="text" name="first_name" value="{{ teleuser.first_name }}">
+                    </p>
+                    <p>
+                        <strong>Отчество:</strong>
+                        <input type="text" name="middle_name" value="{{ teleuser.middle_name }}">
+                    </p>
+                    <p>
+                        <strong>Дата рождения:</strong>
+                        <input type="text" name="date_of_birth" value="{{ teleuser.date_of_birth }}" placeholder="ДД.ММ.ГГГГ">
+                        {% if teleuser.date_of_birth and teleuser.date_of_birth|length < 10 %}
+                            <span class="error">Некорректный формат даты.</span>
+                        {% endif %}
+                    </p>
+                    <p>
+                        <strong>Страна:</strong>
+                        <input type="text" name="country" value="{{ teleuser.country }}">
+                    </p>
+                    <p>
+                        <strong>Организация:</strong>
+                        <select name="company">
+                            <option value="">-- Выберите организацию --</option>
+                            {% for company in companies %}
+                            <option value="{{ company.id }}" {% if teleuser.company and teleuser.company.id == company.id %}selected{% endif %}>
+                                {{ company.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </p>
+                    <p>
+                        <strong>Подразделение:</strong>
+                        <select name="department">
+                            <option value="">-- Выберите подразделение --</option>
+                            {% for department in departments %}
+                            <option value="{{ department.id }}" {% if teleuser.department and teleuser.department.id == department.id %}selected{% endif %}>
+                                {{ department.title }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </p>
+                    <p>
+                        <strong>Должность:</strong>
+                        <select name="job_title">
+                            <option value="">-- Выберите должность --</option>
+                            {% for job_title in job_titles %}
+                            <option value="{{ job_title.id }}" {% if teleuser.job_title and teleuser.job_title.id == job_title.id %}selected{% endif %}>
+                                {{ job_title.title }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </p>
+                    <p>
+                        <strong>Язык:</strong>
+                        <input type="text" name="language" value="{{ teleuser.language }}">
+                    </p>
+                </div>
+
+                <!-- Блок с изображением -->
+                <div style="width:70%;">
+                    <div style="border: none; padding: 5px;">
+                        <label>Фото пользователя</label>
+                        <div style="height: 150px; width: 150px;">
+                            {% if teleuser.image_telegramuser %}
+                                <img src="{{ teleuser.image_telegramuser.url }}" alt="Фото пользователя" 
+                                     style="max-width: 100%; max-height: 150px; border-radius: 50%; object-fit: cover;">
+                            {% endif %}
+                        </div>
+                        <input type="file" name="image_telegramuser" style="display: block; margin-top: 10px;">
+                
+                        <!-- Кнопка Удалить изображение -->
+                        {% if teleuser.image_telegramuser %}
+                        <input type="hidden" name="remove_image" id="remove_image" value="0">
+                        <button type="button" style="margin-top: 10px;" onclick="document.getElementById('remove_image').value = '1';">
+                            Удалить фото
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% if teleuser.pk %}
+            <div style="display: flex; gap: 10px; justify-content: flex-start; margin-top: 20px;">
+                <!-- Блок "Группы пользователя" -->
+                <div style="width: 20%; border: 1px solid #ddd; padding: 10px; background-color: #f0f8ff; border-radius: 8px;">
+                    <h2 style="text-align: center; color: #00234b;">Группы пользователя</h2>
+                    <table style="width: 100%;">
+                        <tbody>
+                            {% for group in groups %}
+                            <tr>
+                                <td style="padding: 5px; border: 1px solid #ddd; background-color: #00234b; color: white; text-align: center;">
+                                    {{ group.name }}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="1" style="text-align: center;">Групп пока нет</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            
+                <!-- Блок "Программы пользователя" -->
+                <div style="width: 20%; border: 1px solid #ddd; padding: 10px; background-color: #f0f8ff; border-radius: 8px;">
+                    <h2 style="text-align: center; color: #00234b;">Программы пользователя</h2>
+                    <table style="width: 100%;">
+                        <tbody>
+                            {% for course in courses %}
+                            <tr>
+                                <td style="padding: 5px; border: 1px solid #ddd; background-color: #00234b; color: white; text-align: center;">
+                                    {{ course.title }}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="1" style="text-align: center;">Программ пока нет</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            
+                <!-- Блок со статистикой -->
+                <div style="width: 20%; border: 1px solid #ddd; padding: 10px; background-color: #f0f8ff; border-radius: 8px;">
+                    <h2 style="text-align: center; color: #00234b;">Статистика:</h2>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td style="padding: 5px;"><strong>Дата регистрации:</strong></td>
+                            <td style="padding: 5px; text-align: right;">{{ user_stats.registration_date }}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td style="padding: 5px;"><strong>Количество групп:</strong></td>
+                            <td style="padding: 5px; text-align: right;">{{ user_stats.group_count }}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td style="padding: 5px;"><strong>Количество курсов:</strong></td>
+                            <td style="padding: 5px; text-align: right;">{{ user_stats.course_count }}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td style="padding: 5px;"><strong>Успешная сдача:</strong></td>
+                            <td style="padding: 5px; text-align: right;">{{ user_stats.successful_tests }}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px;"><strong>Средний % успеха:</strong></td>
+                            <td style="padding: 5px; text-align: right;">{{ user_stats.average_success_percentage }}%</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Кнопки для сохранения и удаления -->
+            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                <div>
+                    <button type="submit" name="save_user" class="save-button" style="margin-right: 10px;">СОХРАНИТЬ</button>
+                    {% if teleuser.pk %}
+                    <!-- Удаление через стандартную форму Django -->
+                    <a href="{% url 'telegramuser_delete' teleuser.id %}" class="delete-button">Удалить</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <p>Выберите пользователя для просмотра деталей.</p>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<!-- Скрипт для установки масок -->
+<script>
+    $(document).ready(function(){
+        // Маска для телефона
+        Inputmask({
+            mask: "+7(999)999-99-99",
+            placeholder: "_",
+            showMaskOnHover: false,
+            showMaskOnFocus: true
+        }).mask('input[name="phone"]');
+
+        // Маска для даты рождения
+        Inputmask({
+            mask: "99.99.9999",
+            placeholder: "_",
+            showMaskOnHover: false,
+            showMaskOnFocus: true
+        }).mask('input[name="date_of_birth"]');
+    });
+</script>
+
+<script>
+    // Добавление строки с выпадающим списком для разделов
+    function addTopicRow() {
+        const topicRow = `
+            <li style="padding: 5px; margin-bottom: 1px;">
+                <select name="topics" style="width: 100%;">
+                    {% for topic in topics %}
+                        <option value="{{ topic.id }}">{{ topic.title }}</option>
+                    {% endfor %}
+                </select>
+            </li>
+        `;
+        document.getElementById('course-topics-list').insertAdjacentHTML('beforeend', topicRow);
+    }
+
+    // Функция для удаления строки раздела и добавления его ID в скрытое поле
+    function removeTopicRow(button) {
+        const row = button.closest('tr');
+        const topicId = row.getAttribute('data-topic-id');  // Получаем ID раздела из атрибута data-topic-id
+        row.remove();
+
+        // Добавляем ID удаленного раздела в скрытое поле
+        let deletedTopics = document.getElementById('deleted_topics').value;
+        document.getElementById('deleted_topics').value = deletedTopics ? deletedTopics + ',' + topicId : topicId;
+    }
+
+    // Добавление строки с выпадающим списком для студентов
+    function addStudentRow() {
+        const studentRow = `
+            <li style="padding: 5px; margin-bottom: 1px;">
+                <select name="students" style="width: 100%;">
+                    {% for student in students %}
+                        <option value="{{ student.id }}">{{ student.full_name }}</option>
+                    {% endfor %}
+                </select>
+            </li>
+        `;
+        document.getElementById('course-students-list').insertAdjacentHTML('beforeend', studentRow);
+    }
+
+    // Функция для удаления строки студента и добавления его ID в скрытое поле
+    function removeStudentRow(button) {
+        const row = button.closest('tr');
+        const userId = row.getAttribute('data-user-id');  // Получаем ID студента из атрибута data-user-id
+        row.remove();
+
+        // Добавляем ID удаленного студента в скрытое поле
+        let deletedStudents = document.getElementById('deleted_students').value;
+        document.getElementById('deleted_students').value = deletedStudents ? deletedStudents + ',' + userId : userId;
+    }
+    
+    // Добавление строки с выпадающим списком для групп
+    function addGroupRow() {
+        const groupRow = `
+            <li style="padding: 5px; margin-bottom: 1px;">
+                <select name="groups" style="width: 100%;">
+                    {% for group in groups %}
+                        <option value="{{ group.id }}">{{ group.name }}</option>
+                    {% endfor %}
+                </select>
+            </li>
+        `;
+        document.getElementById('course-groups-list').insertAdjacentHTML('beforeend', groupRow);
+    }
+
+    // Функция для удаления строки группы и добавления её ID в скрытое поле
+    function removeGroupRow(button) {
+        const row = button.closest('tr');
+        const groupId = row.getAttribute('data-group-id');  // Получаем ID группы из атрибута data-group-id
+        row.remove();
+
+        // Добавляем ID удаленной группы в скрытое поле
+        let deletedGroups = document.getElementById('deleted_groups').value;
+        document.getElementById('deleted_groups').value = deletedGroups ? deletedGroups + ',' + groupId : groupId;
+    }
+</script>
+
+<!-- Стили -->
+<style>
+    .vertical-divider {
+        border-left: 2px solid white;
+        min-height: 100%;
+        margin-left: 20px;
+    }
+
+    .description-field {
+        width: 50%;
+        height: 100px;
+        resize: none;
+    }
+
+    .save-button {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        text-transform: uppercase;
+    }
+
+    .save-button:hover {
+        background-color: #218838;
+    }
+
+    .save-button:active {
+        background-color: #1e7e34;
+    }
+
+    .delete-button {
+        background-color: #dc3545;
+        color: white !important;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        text-transform: uppercase;
+        text-decoration: none;
+    }
+
+    .delete-button:hover {
+        background-color: #c82333;
+    }
+
+    .delete-button:active {
+        background-color: #bd2130;
+    }
+
+    /* Стили для блоков разделов, студентов и групп */
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    li {
+        padding: 5px;
+        border: 1px solid #ddd;
+        margin-bottom: 1px;
+        background-color: #00234b;
+        color: white;
+        width: 50%;
+    }
+
+    button {
+        margin-top: 10px;
+        padding: 5px 10px;
+    }
+
+    /* Добавляем перенос длинных слов в ссылках */
+    a {
+        word-wrap: break-word;
+        word-break: break-word;
+        white-space: normal;
+    }
+</style>
+
+{% endblock %}

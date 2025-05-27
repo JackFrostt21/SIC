@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<HTML>
+<HEAD>
+<!-- saved from url=(0014)about:internet -->
+<TITLE>ПОСТАНОВКА ЦЕЛЕЙ ПО SMART (+ER)</TITLE>
+<STYLE>
+
+.header {
+	position:absolute;
+	left:50px;
+	top:50px;
+	width:800px;
+	font-family:Roboto;
+	font-size: 15pt;
+	color:#373856;
+	z-index:2;
+	
+}
+.line1 {
+  position:absolute;
+  border-bottom: 5px solid #373856;
+  margin: 100px 0 50px;
+  left:50px;
+  width:445px;
+  
+}
+.line2 {
+  position:absolute;
+  border-bottom: 1px solid #373856;
+  margin: 85px 0 50px;
+  left:50px;
+  width:445px;
+  
+}
+.line3 {
+  position:absolute;
+  border-bottom: 1px solid #373856;
+  margin: 90px 0 50px;
+  left:50px;
+  width:445px;
+  
+}
+.focusheader {
+	position:relative;
+	left:50px;
+	top:120px;
+	width:800px;
+	font-family:Roboto medium;
+	font-size: 11pt;
+	color:#373856;
+	z-index:2;
+	
+}
+.focus {
+	position:relative;
+	left:65px;
+	top:120px;
+	width:800px;
+	font-family:Roboto;
+	font-size: 11pt;
+	color:#373856;
+	z-index:2;
+	
+}
+
+
+
+</STYLE>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</HEAD>
+<BODY>
+<div class='header'><b>ПОСТАНОВКА ЦЕЛЕЙ ПО SMART (+ER)</b><br /> 
+Как ставить достижимые цели<br /></div>
+<div class="line1"></div>
+
+
+<SCRIPT>
+	//this grabs the player object from the parent (launching window)
+	var player=window.opener.GetPlayer();
+	//now we pull a field value. You can pull as many as you like. That replace jumble lets you bring over text fields with multiple lines.
+	var focus_1_header=player.GetVar("focus_1_header").replace(/(\r\n|\r|\n)/g, '<br />');
+	var focus_1=player.GetVar("focus_1").replace(/(\r\n|\r|\n)/g, '<br />');
+	var focus_2_header=player.GetVar("focus_2_header").replace(/(\r\n|\r|\n)/g, '<br />');
+	var focus_2=player.GetVar("focus_2").replace(/(\r\n|\r|\n)/g, '<br />');
+	var focus_3_header=player.GetVar("focus_3_header").replace(/(\r\n|\r|\n)/g, '<br />');
+	var focus_3=player.GetVar("focus_3").replace(/(\r\n|\r|\n)/g, '<br />');
+	var focus_4_header=player.GetVar("focus_4_header").replace(/(\r\n|\r|\n)/g, '<br />');
+	var focus_4=player.GetVar("focus_4").replace(/(\r\n|\r|\n)/g, '<br />');
+	<!-- var currentTime = new Date() -->
+    <!-- var month = currentTime.getMonth() + 1 -->
+    <!-- var day = currentTime.getDate() -->
+    <!-- var year = currentTime.getFullYear() -->
+    <!-- var dateString=day + "/" + month + "/" + year    -->
+	
+	document.write("<div class='focusheader'>"+focus_1_header+"</div><br />"); 
+	document.write("<div class='focus'>"+focus_1+"</div><br /><br />"); 
+	document.write("<div class='focusheader'>"+focus_2_header+"</div><br />"); 
+	document.write("<div class='focus'>"+focus_2+"</div><br /><br />"); 
+	document.write("<div class='focusheader'>"+focus_3_header+"</div><br />"); 
+	document.write("<div class='focus'>"+focus_3+"</div><br /><br />"); 
+	document.write("<div class='focusheader'>"+focus_4_header+"</div><br />"); 
+	document.write("<div class='focus'>"+focus_4+"</div><br /><br />"); 
+	<!-- document.write("<div class='time'>"+dateString+"</div>");  -->
+
+
+</SCRIPT> 
+</BODY>
+</HTML>
