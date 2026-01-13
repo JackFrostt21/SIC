@@ -1,0 +1,267 @@
+{% extends "admin/base_site.html" %}
+
+{% block content_title %}Молнии × Пользователи{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="max-width: 100%;">
+    <style>
+        .toolbar {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: .75rem; flex-wrap: wrap; margin-bottom: .5rem;
+        }
+        .toolbar .left, .toolbar .right { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+        .btn { cursor: pointer; }
+        .btn-sm { padding: .25rem .5rem; font-size: .875rem; border-radius: .5rem; }
+        .btn-primary { background:#0d6efd; color:#fff; border:1px solid #0d6efd; }
+        .btn-outline-secondary { background:#fff; color:#6c757d; border:1px solid #ced4da; }
+        .btn-success { background:#198754; color:#fff; border:1px solid #198754; }
+        .btn-light { background:#f8f9fa; color:#212529; border:1px solid #e9ecef; }
+        .btn-danger { background:#dc3545; color:#fff; border:1px solid #dc3545; }
+
+        /* Drawer (шторка) */
+        .drawer-backdrop {
+            position: fixed; inset: 0; background: rgba(0,0,0,.35);
+            opacity:0; pointer-events:none; transition: opacity .2s ease;
+            z-index: 1040;
+        }
+        .drawer-backdrop.show { opacity:1; pointer-events: all; }
+        .drawer {
+            position: fixed; top: 0; right: 0; height: 100%; width: 420px;
+            max-width: 100vw; background: #fff; transform: translateX(100%);
+            transition: transform .25s ease; box-shadow: -8px 0 24px rgba(0,0,0,.12);
+            z-index: 1050; display: flex; flex-direction: column;
+        }
+        .drawer.open { transform: translateX(0); }
+        .drawer-header {
+            padding: .75rem 1rem; border-bottom: 1px solid #f0f0f0;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .drawer-body { padding: 1rem; overflow-y: auto; }
+        .drawer-footer {
+            padding: .75rem 1rem; border-top: 1px solid #f0f0f0; display:flex; gap:.5rem; justify-content:flex-end;
+        }
+
+        /* Сетка формы */
+        .filters-grid { display: grid; grid-template-columns: 1fr; gap: .75rem; }
+        .form-label { display:block; margin-bottom: .25rem; font-size: .85rem; color:#6c757d; }
+        .form-control, .form-select {
+            width: 100%; border: 1px solid #ced4da; border-radius: .5rem;
+            padding: .375rem .5rem; font-size: .9rem;
+        }
+
+        /* Таблица */
+        .report-wrapper { overflow: auto; border: 1px solid #f0f0f0; border-radius: .75rem; }
+        table.table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 960px; }
+        .table thead th { position: sticky; top: 0; background: #f8f9fa; z-index: 3; border-bottom: 1px solid #e9ecef; }
+        .table th, .table td { padding: .5rem .5rem; border-bottom: 1px solid #f2f2f2; border-right: 1px solid #f7f7f7; }
+        .table tr:hover td, .table tr:hover th[scope="row"] { background: #fcfcfd; }
+        /* Залипший первый столбец */
+        .col-sticky {
+            position: sticky; left: 0; z-index: 2; background: #fff;
+            box-shadow: 2px 0 0 rgba(0,0,0,0.02);
+            white-space: nowrap;
+        }
+        .thead-sticky-first { position: sticky; left: 0; z-index: 4; background: #f8f9fa; }
+
+        /* Цвета статусов */
+        .status-ok   { background:#d1e7dd; text-align:center; }
+        .status-warn { background:#fff3cd; text-align:center; }
+        .status-bad  { background:#f8d7da; text-align:center; }
+        .status-na   { background:#fff; text-align:center; }
+
+        /* Легенда */
+        .legend { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; font-size:.9rem; color:#6c757d; }
+        .legend-item { display: inline-flex; align-items: center; gap: .35rem; }
+        .legend-dot { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+        .legend-ok   { background:#d1e7dd; }
+        .legend-warn { background:#fff3cd; }
+        .legend-bad  { background:#f8d7da; }
+        .legend-na   { background:#e2e3e5; }
+
+        .muted { color:#6c757d; font-size:.875rem; }
+    </style>
+
+    <!-- Верхняя панель действий -->
+    <div class="toolbar">
+        <div class="left">
+            <div class="legend">
+              <span class="legend-item"><span class="legend-dot legend-ok"></span> сдал / прочитал</span>
+              <span class="legend-item"><span class="legend-dot legend-warn"></span> прочитал, но тест не сдан</span>
+              <span class="legend-item"><span class="legend-dot legend-bad"></span> не прочитал</span>
+              <span class="legend-item"><span class="legend-dot legend-na"></span> не получал</span>
+            </div>
+        </div>
+        <div class="right">
+            <button type="button" id="btn-open-filters" class="btn btn-sm btn-primary">
+                Настройки
+                {% if has_active_filters %}
+                  <span title="Активны фильтры" style="margin-left:.4rem; font-size: .9em;">●</span>
+                {% endif %}
+            </button>
+            <a class="btn btn-sm btn-success" href="?{% if base_query %}{{ base_query }}&{% endif %}export=xlsx">Экспорт XLSX</a>
+            <a class="btn btn-sm btn-outline-secondary" href="?">Сброс</a>
+        </div>
+    </div>
+
+    {% if lightnings and users %}
+    <div class="report-wrapper">
+        <table class="table table-sm align-middle">
+            <thead>
+                <tr>
+                    <th class="thead-sticky-first">Сотрудник</th>
+                    <th>Должность</th>
+                    <th>Подразделение</th>
+                    <th>Локация</th>
+                    {% for l in lightnings %}
+                        <th class="text-center" title="{{ l.name }}">{{ l.name }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <th scope="row" class="col-sticky">{{ u.full_name }} (ID: {{ u.id }})</th>
+                    <td>{% if u.job_title %}{{ u.job_title.name }} (ID: {{ u.job_title.id }}){% endif %}</td>
+                    <td>{% if u.department and u.department.parent %}{{ u.department.parent.name }} (ID: {{ u.department.parent.id }}){% endif %}</td>
+                    <td>{% if u.department %}{{ u.department.name }} (ID: {{ u.department.id }}){% endif %}</td>
+
+                    {% for l in lightnings %}
+                        {% with uid=u.id|stringformat:"s" lid=l.id|stringformat:"s" %}
+                            {% with key=uid|add:"_"|add:lid %}
+                                {% if key not in has_read_record_pairs %}
+                                    <td class="status-na">не отправлялась</td>
+                                {% elif l.id not in lightnings_with_questions %}
+                                    {% if key in read_pairs %}
+                                        <td class="status-ok">✓</td>
+                                    {% else %}
+                                        <td class="status-bad">×</td>
+                                    {% endif %}
+                                {% elif key in test_complete_pairs %}
+                                    <td class="status-ok">✓</td>
+                                {% elif key in read_pairs %}
+                                    <td class="status-warn">•</td>
+                                {% else %}
+                                    <td class="status-bad">×</td>
+                                {% endif %}
+                            {% endwith %}
+                        {% endwith %}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if users_page and users_page.paginator.num_pages > 1 %}
+    <nav class="d-flex justify-content-center" style="margin-top:.5rem;">
+        <ul class="pagination pagination-sm mb-0">
+            {% if users_page.has_previous %}
+              <li class="page-item"><a class="page-link" href="?{% if base_query %}{{ base_query }}&{% endif %}page={{ users_page.previous_page_number }}">Назад</a></li>
+            {% endif %}
+            <li class="page-item disabled"><span class="page-link">Стр. {{ users_page.number }} из {{ users_page.paginator.num_pages }}</span></li>
+            {% if users_page.has_next %}
+              <li class="page-item"><a class="page-link" href="?{% if base_query %}{{ base_query }}&{% endif %}page={{ users_page.next_page_number }}">Вперёд</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    {% else %}
+    <div class="alert alert-info">Нет данных для отображения.</div>
+    {% endif %}
+
+    <!-- Шторка с фильтрами -->
+    <div id="drawer-backdrop" class="drawer-backdrop"></div>
+    <div id="filters-drawer" class="drawer" aria-hidden="true">
+        <div class="drawer-header">
+            <strong>Настройки отчёта</strong>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-close-filters">Закрыть</button>
+        </div>
+        <form method="get" class="drawer-body" id="filters-form">
+            <div class="filters-grid">
+                <div>
+                    <label class="form-label">Молния</label>
+                    <select name="lightning_id" class="form-select">
+                        <option value="">Все</option>
+                        {% for l in filter_lightnings %}
+                            <option value="{{ l.id }}" {% if request.GET.lightning_id|default:'' == l.id|stringformat:'s' %}selected{% endif %}>[{{ l.id }}] {{ l.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">Подразделение (родители)</label>
+                    <select name="department_id" class="form-select" multiple>
+                      {% for d in departments %}
+                        <option value="{{ d.id }}" {% if d.id|stringformat:'s' in selected_department_ids %}selected{% endif %}>
+                          [{{ d.id }}] {{ d.name }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                <div class="form-text">Можно выбрать несколько (Ctrl/Shift).</div>
+                </div>
+                <div>
+                    <label class="form-label">Локация</label>
+                    <select name="location_id" class="form-select" multiple>
+                      {% for loc in locations %}
+                        <option value="{{ loc.id }}" {% if loc.id|stringformat:'s' in selected_location_ids %}selected{% endif %}>
+                          [{{ loc.id }}] {{ loc.name }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                    <div class="form-text">Если выбрано подразделение — локации игнорируются.</div>
+                </div>
+                <div>
+                    <label class="form-label">Должность</label>
+                    <select name="job_title_id" class="form-select" multiple>
+                      {% for j in job_titles %}
+                        <option value="{{ j.id }}" {% if j.id|stringformat:'s' in selected_job_title_ids %}selected{% endif %}>
+                          [{{ j.id }}] {{ j.name }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">Пользователь (ФИО содержит)</label>
+                    <input type="text" name="user_query" value="{{ request.GET.user_query|default:'' }}" class="form-control" placeholder="Иванов Иван">
+                </div>
+                <div>
+                    <label class="form-label">Дата от</label>
+                    <input type="date" name="date_from" value="{{ request.GET.date_from|default:'' }}" class="form-control">
+                </div>
+                <div>
+                    <label class="form-label">Дата до</label>
+                    <input type="date" name="date_to" value="{{ request.GET.date_to|default:'' }}" class="form-control">
+                </div>
+            </div>
+        </form>
+        <div class="drawer-footer">
+            <a class="btn btn-sm btn-outline-secondary" href="?">Сброс</a>
+            <button type="submit" form="filters-form" class="btn btn-sm btn-primary">Применить</button>
+        </div>
+    </div>
+
+    <script>
+        (function(){
+            const openBtn = document.getElementById('btn-open-filters');
+            const closeBtn = document.getElementById('btn-close-filters');
+            const drawer = document.getElementById('filters-drawer');
+            const backdrop = document.getElementById('drawer-backdrop');
+
+            function openDrawer(){
+                drawer.classList.add('open');
+                backdrop.classList.add('show');
+                drawer.setAttribute('aria-hidden', 'false');
+            }
+            function closeDrawer(){
+                drawer.classList.remove('open');
+                backdrop.classList.remove('show');
+                drawer.setAttribute('aria-hidden', 'true');
+            }
+
+            openBtn && openBtn.addEventListener('click', openDrawer);
+            closeBtn && closeBtn.addEventListener('click', closeDrawer);
+            backdrop && backdrop.addEventListener('click', closeDrawer);
+            window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
+        })();
+    </script>
+</div>
+{% endblock %}

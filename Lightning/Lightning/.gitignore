@@ -1,0 +1,8 @@
+.lightning
+.env
+db.sqlite3
+cert.pem
+key.pem
+.vscode
+media
+staticfiles
