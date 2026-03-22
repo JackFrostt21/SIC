@@ -1,0 +1,16 @@
+{% extends "shopapp/base.html" %}
+
+{% block title %}
+    Products List
+{% endblock %}
+
+{% block body %}
+    <h1>Products:</h1>
+    <div>
+        <ul>
+            {% for product in products %}
+            <li>{{ product.name }} ({{ product.price }})</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

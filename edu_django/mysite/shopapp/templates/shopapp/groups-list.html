@@ -1,0 +1,16 @@
+{% extends "shopapp/base.html" %}
+
+{% block title %}
+    Groups List
+{% endblock %}
+
+{% block body %}
+    <h1>Groups:</h1>
+    <div>
+        <ul>
+            {% for group in groups %}
+            <li>{{ group.name }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
