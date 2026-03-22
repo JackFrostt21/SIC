@@ -1,3 +1,2 @@
-.everybase
-.testproject
+.venv
 db.sqlite3
