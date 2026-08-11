@@ -1,0 +1,311 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+
+  <h1 class="mb-3">{{ title }}</h1>
+
+  <div class="btn-group mb-3" role="group">
+    <a href="?tab=courses" class="btn btn-outline-primary {% if active_tab == 'courses' %}active{% endif %}">
+      📚 Курсы
+    </a>
+    <a href="?tab=students" class="btn btn-outline-primary {% if active_tab == 'students' %}active{% endif %}">
+      👥 Студенты
+    </a>
+    <a href="?tab=ratings" class="btn btn-outline-primary {% if active_tab == 'ratings' %}active{% endif %}">
+      ⭐ Рейтинги
+    </a>
+    <a href="?tab=deadlines" class="btn btn-outline-primary {% if active_tab == 'deadlines' %}active{% endif %}">
+      ⏰ Дедлайны
+    </a>
+    <a href="?tab=topics" class="btn btn-outline-primary {% if active_tab == 'topics' %}active{% endif %}">
+      📈 Прогресс
+    </a>
+    <a href="?tab=tests" class="btn btn-outline-primary {% if active_tab == 'tests' %}active{% endif %}">
+      🎯 Тесты
+    </a>
+    <a href="?tab=top_students" class="btn btn-outline-primary {% if active_tab == 'top_students' %}active{% endif %}">
+      🏆 Топ
+    </a>
+  </div>
+
+  {# ---------- Таблица: Курсы ---------- #}
+  <div id="tab-courses" style="{% if active_tab != 'courses' %}display:none{% endif %}">
+    <div class="card">
+      <div class="card-body table-responsive p-0">
+        <table class="table table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th style="width: 40%">Курс</th>
+              <th style="width: 20%">Количество студентов</th>
+              <th style="width: 20%">Курс пройден</th>
+              <th style="width: 20%">Курс не пройден</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in courses_rows %}
+            <tr>
+              <td>
+                {% if row.admin_change_url %}
+                  <a href="{{ row.admin_change_url }}">{{ row.title }}</a>
+                {% else %}
+                  {{ row.title }}
+                {% endif %}
+              </td>
+              <td>{{ row.students_count }}</td>
+              <td>{{ row.completed }}</td>
+              <td>{{ row.not_completed }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-muted p-3">Нет данных</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  {# ---------- Таблица: Студенты ---------- #}
+  <div id="tab-students" style="{% if active_tab != 'students' %}display:none{% endif %}">
+    <div class="card">
+      <div class="card-body table-responsive p-0">
+        <table class="table table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th style="width: 40%">ФИО</th>
+              <th style="width: 20%">Курсов всего</th>
+              <th style="width: 20%">Курсов пройдено</th>
+              <th style="width: 20%">Курсов не пройдено</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in students_rows %}
+            <tr>
+              <td>{{ row.full_name }}</td>
+              <td>{{ row.courses_total }}</td>
+              <td>{{ row.courses_completed }}</td>
+              <td>{{ row.courses_not_completed }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-muted p-3">Нет данных</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  {# ---------- Таблица: Рейтинги курсов ---------- #}
+  <div id="tab-ratings" style="{% if active_tab != 'ratings' %}display:none{% endif %}">
+    <div class="card">
+      <div class="card-body table-responsive p-0">
+        <table class="table table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th style="width: 30%">Курс</th>
+              <th style="width: 15%">Средний рейтинг</th>
+              <th style="width: 10%">Оценок</th>
+              <th style="width: 15%">Положительных</th>
+              <th style="width: 30%">Последние комментарии</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in ratings_rows %}
+            <tr>
+              <td>
+                <a href="{{ row.admin_change_url }}">{{ row.course_title }}</a>
+              </td>
+              <td>
+                <strong>{{ row.avg_rating }}</strong> {{ row.stars }}
+              </td>
+              <td>{{ row.ratings_count }}</td>
+              <td>{{ row.positive_percent }}%</td>
+              <td>
+                {% for comment in row.recent_comments %}
+                  <div class="mb-2">
+                    <small class="text-muted">{{ comment.student_name }} ({{ comment.rating }}⭐):</small><br>
+                    <small>{{ comment.comment|truncatewords:15 }}</small>
+                  </div>
+                {% empty %}
+                  <small class="text-muted">—</small>
+                {% endfor %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-muted p-3">Нет оценок</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  {# ---------- Таблица: Дедлайны ---------- #}
+  <div id="tab-deadlines" style="{% if active_tab != 'deadlines' %}display:none{% endif %}">
+    <div class="card">
+      <div class="card-body table-responsive p-0">
+        <table class="table table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th style="width: 25%">Курс</th>
+              <th style="width: 10%">Дедлайн</th>
+              <th style="width: 10%">Студентов</th>
+              <th style="width: 13%">Выполнили до</th>
+              <th style="width: 13%">Выполнили после</th>
+              <th style="width: 13%">Не выполнили</th>
+              <th style="width: 16%">Статус</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in deadlines_rows %}
+            <tr>
+              <td>{{ row.course_title }}</td>
+              <td>{{ row.deadline_date|date:"d.m.Y" }}</td>
+              <td>{{ row.total_students }}</td>
+              <td><span class="badge badge-success">{{ row.completed_before }}</span></td>
+              <td><span class="badge badge-warning">{{ row.completed_after }}</span></td>
+              <td><span class="badge badge-danger">{{ row.not_completed }}</span></td>
+              <td>
+                <span class="badge badge-{{ row.status_class }}">{{ row.status }}</span>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-muted p-3">Нет дедлайнов</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  {# ---------- Таблица: Прогресс по темам ---------- #}
+  <div id="tab-topics" style="{% if active_tab != 'topics' %}display:none{% endif %}">
+    <div class="card">
+      <div class="card-body table-responsive p-0">
+        <table class="table table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th style="width: 22%">Курс</th>
+              <th style="width: 25%">Тема</th>
+              <th style="width: 8%">Назначено</th>
+              <th style="width: 8%">Прочитали</th>
+              <th style="width: 8%">Не прочитали</th>
+              <th style="width: 14%">% прочтения</th>
+              <th style="width: 15%">Последнее прочтение</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in topics_rows %}
+            <tr>
+              <td>{{ row.course_title }}</td>
+              <td>{{ row.topic_title }}</td>
+              <td>{{ row.total_assigned }}</td>
+              <td>{{ row.read_count }}</td>
+              <td>{{ row.not_read_count }}</td>
+              <td>
+                <div class="progress" style="height: 20px;">
+                  <div class="progress-bar {% if row.read_percent < 30 %}bg-danger{% elif row.read_percent < 70 %}bg-warning{% else %}bg-success{% endif %}" 
+                       role="progressbar" 
+                       style="width: {{ row.read_percent }}%"
+                       aria-valuenow="{{ row.read_percent }}" 
+                       aria-valuemin="0" 
+                       aria-valuemax="100">
+                    {{ row.read_percent }}%
+                  </div>
+                </div>
+              </td>
+              <td><small>{{ row.last_read_date }}</small></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-muted p-3">Нет данных</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  {# ---------- Таблица: Результаты тестирования ---------- #}
+  <div id="tab-tests" style="{% if active_tab != 'tests' %}display:none{% endif %}">
+    <div class="card">
+      <div class="card-body table-responsive p-0">
+        <table class="table table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th style="width: 25%">Курс</th>
+              <th style="width: 10%">Попыток</th>
+              <th style="width: 12%">Успешных</th>
+              <th style="width: 13%">С 1-й попытки</th>
+              <th style="width: 15%">Средний балл</th>
+              <th style="width: 12%">Пересдач</th>
+              <th style="width: 13%">Средн. попыток</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in tests_rows %}
+            <tr>
+              <td>
+                <a href="{{ row.admin_change_url }}">{{ row.course_title }}</a>
+              </td>
+              <td>{{ row.total_attempts }}</td>
+              <td><span class="badge badge-success">{{ row.successful_count }}</span></td>
+              <td>
+                {{ row.first_attempt_success }} 
+                <small class="text-muted">({{ row.first_attempt_percent }}%)</small>
+              </td>
+              <td>
+                <strong>{{ row.avg_correct }}%</strong>
+              </td>
+              <td><span class="badge badge-warning">{{ row.retake_count }}</span></td>
+              <td>{{ row.avg_attempts }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-muted p-3">Нет тестов</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  {# ---------- Таблица: Топ студентов (расширенная) ---------- #}
+  <div id="tab-top_students" style="{% if active_tab != 'top_students' %}display:none{% endif %}">
+    <div class="card">
+      <div class="card-body table-responsive p-0">
+        <table class="table table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th style="width: 25%">ФИО</th>
+              <th style="width: 10%">Всего курсов</th>
+              <th style="width: 10%">Пройдено</th>
+              <th style="width: 10%">Не пройдено</th>
+              <th style="width: 15%">Средний балл</th>
+              <th style="width: 15%">Средн. попыток</th>
+              <th style="width: 15%">Последняя активность</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in top_students_rows %}
+            <tr>
+              <td>{{ row.full_name }}</td>
+              <td>{{ row.courses_total }}</td>
+              <td><span class="badge badge-success">{{ row.courses_completed }}</span></td>
+              <td><span class="badge badge-danger">{{ row.courses_not_completed }}</span></td>
+              <td>
+                <strong>{{ row.avg_score }}%</strong>
+              </td>
+              <td>{{ row.avg_attempts }}</td>
+              <td><small>{{ row.last_activity }}</small></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-muted p-3">Нет данных</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+services:
+  docs:
+    image: config_project_local_docs
+    container_name: config_project_local_docs
+    build:
+      context: .
+      dockerfile: ./compose/local/docs/Dockerfile
+    env_file:
+      - ./.envs/.local/.django
+    volumes:
+      - /app/.venv
+      - ./docs:/docs:z
+      - ./config:/app/config:z
+      - ./config_project:/app/config_project:z
+    ports:
+      - '9000:9000'
+    command: /start-docs

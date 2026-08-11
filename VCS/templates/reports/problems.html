@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Проблемные ТС | ЭНГС{% endblock %}
+
+{% block content %}
+    <section class="panel">
+        <form method="get" class="filter-form">
+            <div class="field-group">
+                <label for="id_analysis_date">Дата анализа</label>
+                <input id="id_analysis_date" type="date" name="analysis_date" value="{{ analysis_date|date:'Y-m-d' }}">
+            </div>
+            <div class="field-group field-group-small">
+                <label for="id_days">Период, дней</label>
+                <input id="id_days" type="number" name="days" min="1" max="365" value="{{ days }}">
+            </div>
+            <button type="submit" class="btn-primary">Обновить</button>
+            <p class="form-hint">Анализ геозон: с {{ period_start|date:"d.m.Y" }} по {{ analysis_date|date:"d.m.Y" }}.</p>
+        </form>
+    </section>
+
+    <section class="stats-grid stats-grid-single">
+        <article class="stat-card">
+            <span class="stat-label">Проблемных ТС</span>
+            <strong class="stat-value">{{ problem_count }}</strong>
+        </article>
+    </section>
+
+    {% if groups %}
+        <div class="problem-groups">
+            {% for group in groups %}
+                <section class="problem-card">
+                    <header class="problem-card-header">
+                        <h2>{{ group.name }}</h2>
+                        <span>{{ group.count }} ТС</span>
+                    </header>
+
+                    <div class="table-wrap">
+                        <table class="problems-table">
+                            <thead>
+                                <tr>
+                                    <th>Госномер</th>
+                                    <th>Статус</th>
+                                    <th>Последняя проверка</th>
+                                    <th>Дней без проверки</th>
+                                    <th>Основная геозона</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in group.rows %}
+                                    <tr>
+                                        <td class="cell-strong">{{ row.vehicle.plate_number }}</td>
+                                        <td>
+                                            <span class="badge {{ row.badge_class }}">{{ row.tone_label }}</span>
+                                        </td>
+                                        <td>
+                                            {% if row.last_inspection_date %}
+                                                {{ row.last_inspection_date|date:"d.m.Y" }}
+                                            {% else %}
+                                                —
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if row.days_without_inspection is not None %}
+                                                {{ row.days_without_inspection }}
+                                            {% else %}
+                                                —
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ row.primary_geozone }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            {% endfor %}
+        </div>
+    {% else %}
+        <section class="panel empty-panel">
+            <p class="empty-copy">На выбранную дату проблемных ТС не найдено.</p>
+        </section>
+    {% endif %}
+{% endblock %}

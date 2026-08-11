@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ЭНГС — Контроль проверок транспортных средств</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Inter', 'Arial', sans-serif;
+            background: #eef2f5;
+            color: #1a2c3e;
+            padding: 20px;
+        }
+
+        :root {
+            --engs-dark: #00234B;
+            --engs-cyan: #00DCC8;
+            --engs-red: #D21E41;
+            --engs-green: #5FD26E;
+            --engs-yellow: #E6C800;
+            --engs-gray-light: #DCE1E6;
+            --engs-gray-medium: #AFC8CD;
+            --engs-white: #FFFFFF;
+        }
+
+        .app-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: var(--engs-white);
+            border-radius: 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--engs-dark);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-bottom: 3px solid var(--engs-cyan);
+        }
+        .logo h1 {
+            color: white;
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+        .logo p {
+            color: var(--engs-cyan);
+            font-size: 0.75rem;
+            margin-top: 4px;
+        }
+        .btn-add {
+            background: var(--engs-cyan);
+            color: var(--engs-dark);
+            border: none;
+            padding: 8px 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-add:hover {
+            opacity: 0.85;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--engs-gray-light);
+            background: #f8fafc;
+            padding: 0 24px;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 12px 24px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--engs-dark);
+            transition: 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn.active {
+            border-bottom-color: var(--engs-cyan);
+            color: var(--engs-cyan);
+        }
+        .tab-content {
+            display: none;
+            padding: 20px 24px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        .period-panel {
+            background: #f9fafb;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+            border: 1px solid var(--engs-gray-light);
+        }
+        .period-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .period-group label {
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: var(--engs-dark);
+        }
+        .period-group input, .period-group select {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+        .btn-filter {
+            background: var(--engs-dark);
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn-filter:hover {
+            background: var(--engs-cyan);
+            color: var(--engs-dark);
+        }
+
+        .stats-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #f0f4f8;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .stat-card span {
+            font-weight: normal;
+            margin-left: 8px;
+            background: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+
+        /* Матрица */
+        .matrix-wrapper {
+            overflow-x: auto;
+            border: 1px solid var(--engs-gray-light);
+            border-radius: 12px;
+            background: white;
+            max-height: 65vh;
+            overflow-y: auto;
+        }
+        .matrix-table {
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            min-width: 100%;
+        }
+        .matrix-table th {
+            background: var(--engs-dark);
+            color: white;
+            padding: 10px 8px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        .matrix-table th:first-child {
+            left: 0;
+            z-index: 20;
+            background: var(--engs-dark);
+        }
+        .matrix-table td {
+            border-bottom: 1px solid #e9ecef;
+            padding: 8px 6px;
+            text-align: center;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+        .matrix-table td:first-child {
+            position: sticky;
+            left: 0;
+            background: white;
+            font-weight: bold;
+            z-index: 5;
+            box-shadow: 2px 0 5px -2px rgba(0,0,0,0.1);
+            cursor: default;
+        }
+        .matrix-table td:hover:not(:first-child) {
+            background: #e0f0fa;
+        }
+        .cell-good { background-color: white; }
+        .cell-warning { background-color: rgba(230, 200, 0, 0.25); }
+        .cell-danger { background-color: rgba(210, 30, 65, 0.2); }
+        .geozone-text { font-size: 0.75rem; font-weight: 500; }
+        .check-mark {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background-color: #2e7d32;
+            border-radius: 50%;
+            margin-left: 5px;
+            vertical-align: middle;
+            box-shadow: 0 0 2px rgba(0,0,0,0.3);
+        }
+
+        /* Проблемные ТС */
+        .problem-grid { display: flex; flex-direction: column; gap: 24px; }
+        .geozone-card { border: 1px solid var(--engs-gray-light); border-radius: 16px; overflow: hidden; }
+        .geozone-header { background: var(--engs-dark); color: white; padding: 10px 16px; font-weight: bold; }
+        .geozone-table { width: 100%; border-collapse: collapse; }
+        .geozone-table th, .geozone-table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #eee; }
+        .geozone-table th { background: #eef2f5; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; }
+        .badge-red { background: var(--engs-red); color: white; }
+        .badge-yellow { background: var(--engs-yellow); color: black; }
+
+        /* Журнал проверок — исправленное выравнивание */
+        .checks-log-wrapper {
+            overflow-x: auto;
+            border: 1px solid var(--engs-gray-light);
+            border-radius: 12px;
+            background: white;
+            max-height: 65vh;
+            overflow-y: auto;
+        }
+        .checks-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .checks-table th {
+            background: var(--engs-dark);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
+        }
+        .checks-table td {
+            padding: 10px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+        .delete-check {
+            background: none;
+            border: none;
+            color: var(--engs-red);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-card {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .modal-header { background: var(--engs-dark); padding: 14px 20px; color: white; }
+        .modal-body { padding: 20px; }
+        .form-group { margin-bottom: 16px; position: relative; }
+        .form-group label { font-weight: 600; font-size: 0.8rem; display: block; margin-bottom: 5px; }
+        .form-group input { width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 8px; }
+        .autocomplete-list {
+            position: absolute;
+            background: white;
+            border: 1px solid #ccc;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 2100;
+            width: 100%;
+            top: 100%;
+            left: 0;
+        }
+        .autocomplete-item { padding: 6px 12px; cursor: pointer; }
+        .autocomplete-item:hover { background: var(--engs-cyan); color: white; }
+        .modal-footer { padding: 12px 20px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #eee; }
+        .btn-save { background: var(--engs-cyan); border: none; padding: 6px 18px; border-radius: 30px; font-weight: bold; cursor: pointer; }
+        .footer-note { text-align: center; font-size: 0.7rem; padding: 16px; color: #6c757d; border-top: 1px solid var(--engs-gray-light); }
+        @media (max-width: 700px) {
+            .period-panel { flex-direction: column; align-items: stretch; }
+            .matrix-table th, .matrix-table td { font-size: 0.7rem; padding: 6px 4px; }
+            .checks-table th, .checks-table td { padding: 8px 10px; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="header">
+        <div class="logo">
+            <h1>ЭНГС</h1>
+            <p>контроль проверок транспортных средств</p>
+        </div>
+        <button class="btn-add" id="openModalBtn">+ Новая проверка</button>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="matrix">📅 Календарная матрица</button>
+        <button class="tab-btn" data-tab="problems">⚠️ Проблемные ТС по геозонам</button>
+        <button class="tab-btn" data-tab="checkslog">📋 Журнал всех проверок</button>
+    </div>
+
+    <!-- Матрица -->
+    <div id="tab-matrix" class="tab-content active">
+        <div class="period-panel">
+            <div class="period-group"><label>Тип периода</label><select id="periodType"><option value="month">Месяц</option><option value="quarter">Квартал</option><option value="custom">Произвольный</option></select></div>
+            <div class="period-group"><label>Начало</label><input type="date" id="startDate"></div>
+            <div class="period-group"><label>Конец</label><input type="date" id="endDate"></div>
+            <button class="btn-filter" id="applyPeriodBtn">Показать</button>
+        </div>
+        <div class="stats-row" id="matrixStats"></div>
+        <div class="matrix-wrapper">
+            <table class="matrix-table" id="matrixTable">
+                <thead id="matrixHeader"><tr><th>Гос номер</th></tr></thead>
+                <tbody id="matrixBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Проблемные ТС -->
+    <div id="tab-problems" class="tab-content">
+        <div class="period-panel">
+            <div class="period-group"><label>Анализировать за последние (дней)</label><input type="number" id="problemDays" value="90" min="1" style="width:100px;"></div>
+            <button class="btn-filter" id="refreshProblemsBtn">Обновить</button>
+            <button class="btn-filter" id="exportProblemsBtn" style="background: var(--engs-green); color: var(--engs-dark);">📎 Экспорт проблемных ТС (CSV)</button>
+        </div>
+        <div id="problemsContainer" class="problem-grid"></div>
+    </div>
+
+    <!-- Журнал проверок (исправленное выравнивание) -->
+    <div id="tab-checkslog" class="tab-content">
+        <div class="stats-row"><div class="stat-card">Всего проверок: <span id="checksCount">0</span></div></div>
+        <div class="checks-log-wrapper">
+            <table class="checks-table">
+                <thead>
+                    <tr><th>Дата проверки</th><th>Гос номер ТС</th><th>Ссылка на видео/документ</th><th>Действие</th></tr>
+                </thead>
+                <tbody id="checksLogBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer-note">📌 Зелёный кружок ● в ячейке матрицы означает, что в этот день проведена проверка (кликните по ячейке, чтобы открыть файл). Цвет фона: 🟢 проверка <30 дней, 🟡 30–90 дней, 🔴 >90 дней или нет проверки. Данные геозон — утреннее окно 6:00–9:00 (Omnicomm).</div>
+</div>
+
+<!-- Модальное окно -->
+<div id="checkModal" class="modal">
+    <div class="modal-card">
+        <div class="modal-header"><h3>Новая проверка ТС</h3></div>
+        <div class="modal-body">
+            <div class="form-group"><label>Дата проверки</label><input type="date" id="checkDate"></div>
+            <div class="form-group" style="position: relative;"><label>Гос номер ТС</label><input type="text" id="vehiclePlateInput" autocomplete="off" placeholder="Начните вводить номер..."><div id="autocompleteList" class="autocomplete-list" style="display: none;"></div></div>
+            <div class="form-group"><label>Ссылка на видео / документ</label><input type="url" id="fileLink" placeholder="https://..."></div>
+        </div>
+        <div class="modal-footer"><button id="modalCancelBtn">Отмена</button><button id="modalSaveBtn" class="btn-save">Сохранить</button></div>
+    </div>
+</div>
+
+<script>
+    // ------------------- БАЗА ДАННЫХ (localStorage) -------------------
+    let allVehicles = [];
+    let checks = [];
+    let geozones = {};
+
+    function initTestData() {
+        allVehicles = [
+            "А505МХ89","С473МЕ89","0350СК89","0380СК89","0482СК89","0562СК89","0624СК89","0694СК89","0736СК89","0803СК89",
+            "0811СК89","0837СК89","0967СК89","0994СК89","0995СК89","0996СК89","0997СК89","1161СМ89","1203СМ89","1205СМ89",
+            "1446СК89","1502СК89","1557СМ89","1652СМ89","1738СМ89","1739СМ89","1740СМ89","1978СК89","2037СК89","2361СК89",
+            "2407СК89","2408СК89","2410СК89","2411СК89","2412СК89","2414СК89","2415СК89","2417СК89","2479СК89","2594СК89",
+            "2846СК89","2936СЕ89","3004СЕ89","3005СЕ89","3298СР89","3311СР89","3723СХ89","3725СХ89","3726СХ89","3727СХ89"
+        ];
+        const today = new Date().toISOString().split('T')[0];
+        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+        const weekAgo = new Date(Date.now() - 7*86400000).toISOString().split('T')[0];
+        const monthAgo = new Date(Date.now() - 35*86400000).toISOString().split('T')[0];
+        const threeMonthsAgo = new Date(Date.now() - 95*86400000).toISOString().split('T')[0];
+        checks = [
+            { id: 1001, date: today, plate: "А505МХ89", file_link: "https://example.com/video_today" },
+            { id: 1002, date: yesterday, plate: "С473МЕ89", file_link: "https://cloud.engs.ru/doc_yest" },
+            { id: 1003, date: weekAgo, plate: "0350СК89", file_link: "https://youtu.be/week_ago" },
+            { id: 1004, date: monthAgo, plate: "0380СК89", file_link: "https://drive.google.com/file/d/example" },
+            { id: 1005, date: threeMonthsAgo, plate: "0482СК89", file_link: "https://example.com/old_check" }
+        ];
+        const geozoneNames = ["Арктикгаз", "Роспан", "БПО", "ГПН-3", "ГПН-4", "ГПН-5"];
+        const startDate = new Date(); startDate.setDate(startDate.getDate() - 60);
+        for (let i = 0; i < allVehicles.length; i++) {
+            const plate = allVehicles[i];
+            geozones[plate] = {};
+            for (let d = new Date(startDate); d <= new Date(); d.setDate(d.getDate()+1)) {
+                const dateStr = d.toISOString().split('T')[0];
+                const randomZone = geozoneNames[Math.floor(Math.random() * geozoneNames.length)];
+                geozones[plate][dateStr] = randomZone;
+            }
+        }
+        if (geozones["А505МХ89"]) geozones["А505МХ89"][today] = "Арктикгаз";
+        if (geozones["С473МЕ89"]) geozones["С473МЕ89"][yesterday] = "Роспан";
+    }
+
+    function saveToLocalStorage() {
+        localStorage.setItem('engs_vehicles', JSON.stringify(allVehicles));
+        localStorage.setItem('engs_checks', JSON.stringify(checks));
+        localStorage.setItem('engs_geozones', JSON.stringify(geozones));
+    }
+
+    function loadFromLocalStorage() {
+        const v = localStorage.getItem('engs_vehicles');
+        const c = localStorage.getItem('engs_checks');
+        const g = localStorage.getItem('engs_geozones');
+        if (v && c && g) {
+            allVehicles = JSON.parse(v);
+            checks = JSON.parse(c);
+            geozones = JSON.parse(g);
+        } else {
+            initTestData();
+            saveToLocalStorage();
+        }
+    }
+
+    function getCheckForDate(plate, date) {
+        return checks.find(ch => ch.plate === plate && ch.date === date);
+    }
+
+    function getLastCheck(plate) {
+        let last = null;
+        for (let ch of checks) {
+            if (ch.plate === plate && (!last || ch.date > last.date)) last = ch;
+        }
+        return last;
+    }
+
+    function getColorClass(plate, cellDate) {
+        const last = getLastCheck(plate);
+        if (!last) return 'cell-danger';
+        const lastDate = new Date(last.date);
+        const current = new Date(cellDate);
+        if (lastDate > current) return 'cell-good';
+        const diffDays = Math.floor((current - lastDate) / (1000*3600*24));
+        if (diffDays <= 30) return 'cell-good';
+        if (diffDays <= 90) return 'cell-warning';
+        return 'cell-danger';
+    }
+
+    async function renderMatrix(startDateStr, endDateStr) {
+        let dates = [];
+        let start = new Date(startDateStr);
+        let end = new Date(endDateStr);
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate()+1)) dates.push(d.toISOString().split('T')[0]);
+        if (dates.length === 0) return;
+
+        const thead = document.getElementById('matrixHeader');
+        let headerHtml = '<tr><th>Гос номер</th>';
+        dates.forEach(date => {
+            const formatted = new Date(date).toLocaleDateString('ru-RU', {day:'numeric', month:'short'});
+            headerHtml += `<th>${formatted}</th>`;
+        });
+        headerHtml += '</tr>';
+        thead.innerHTML = headerHtml;
+
+        const tbody = document.getElementById('matrixBody');
+        let bodyHtml = '';
+        for (let plate of allVehicles) {
+            bodyHtml += `<tr><td style="font-weight:bold;">${plate}</td>`;
+            for (let date of dates) {
+                let geozone = (geozones[plate] && geozones[plate][date]) ? geozones[plate][date] : '—';
+                let colorClass = getColorClass(plate, date);
+                let check = getCheckForDate(plate, date);
+                let hasCheckMark = check ? '<span class="check-mark" title="Проверка проведена"></span>' : '';
+                let cellContent = `<span class="geozone-text">${geozone}</span>${hasCheckMark}`;
+                let dataAttr = '';
+                if (check && check.file_link) {
+                    dataAttr = `data-link="${check.file_link.replace(/"/g, '&quot;')}" data-has-link="true"`;
+                } else {
+                    dataAttr = `data-has-link="false"`;
+                }
+                bodyHtml += `<td class="${colorClass}" ${dataAttr} data-plate="${plate}" data-date="${date}">${cellContent}</td>`;
+            }
+            bodyHtml += '</tr>';
+        }
+        tbody.innerHTML = bodyHtml;
+
+        document.querySelectorAll('#matrixBody td').forEach(td => {
+            if (td.getAttribute('data-has-link') === 'true') {
+                td.style.cursor = 'pointer';
+                td.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const link = td.getAttribute('data-link');
+                    if (link && link !== '') window.open(link, '_blank');
+                    else alert('Ссылка на файл отсутствует');
+                });
+            } else td.style.cursor = 'default';
+        });
+
+        const today = new Date().toISOString().split('T')[0];
+        let good=0, warning=0, danger=0;
+        for (let plate of allVehicles) {
+            const cls = getColorClass(plate, today);
+            if (cls === 'cell-good') good++;
+            else if (cls === 'cell-warning') warning++;
+            else danger++;
+        }
+        document.getElementById('matrixStats').innerHTML = `
+            <div class="stat-card">🚛 Всего ТС: <span>${allVehicles.length}</span></div>
+            <div class="stat-card">✅ Проверены <30 дн: <span>${good}</span></div>
+            <div class="stat-card">⚠️ 30–90 дн: <span>${warning}</span></div>
+            <div class="stat-card">🔴 >90 дн / нет: <span>${danger}</span></div>
+        `;
+    }
+
+    function getPrimaryZone(plate, daysBack) {
+        const endDate = new Date().toISOString().split('T')[0];
+        const startDate = new Date(Date.now() - daysBack*24*3600*1000).toISOString().split('T')[0];
+        let zoneCount = {};
+        if (!geozones[plate]) return null;
+        for (let [date, zone] of Object.entries(geozones[plate])) {
+            if (date >= startDate && date <= endDate && zone && zone !== '—') {
+                zoneCount[zone] = (zoneCount[zone] || 0) + 1;
+            }
+        }
+        let maxCount = 0, bestZone = null;
+        for (let [z, cnt] of Object.entries(zoneCount)) if (cnt > maxCount) { maxCount = cnt; bestZone = z; }
+        return bestZone;
+    }
+
+    async function loadProblems(daysBack) {
+        const today = new Date().toISOString().split('T')[0];
+        let problemVehicles = [];
+        for (let plate of allVehicles) {
+            const cls = getColorClass(plate, today);
+            if (cls !== 'cell-good') {
+                const last = getLastCheck(plate);
+                const lastDate = last ? last.date : null;
+                const daysSince = lastDate ? Math.floor((new Date() - new Date(lastDate))/(1000*3600*24)) : null;
+                const primaryZone = getPrimaryZone(plate, daysBack) || 'не определена';
+                problemVehicles.push({
+                    plate, status: cls === 'cell-warning' ? 'warning' : 'danger',
+                    lastCheck: lastDate || '—',
+                    days: daysSince ? daysSince : '—',
+                    primaryZone
+                });
+            }
+        }
+        let zonesMap = new Map();
+        for (let pv of problemVehicles) {
+            const zone = pv.primaryZone;
+            if (!zonesMap.has(zone)) zonesMap.set(zone, []);
+            zonesMap.get(zone).push(pv);
+        }
+        const container = document.getElementById('problemsContainer');
+        if (zonesMap.size === 0) {
+            container.innerHTML = '<div class="stat-card" style="text-align:center;">✅ Нет проблемных ТС за выбранный период</div>';
+            return;
+        }
+        let html = '';
+        for (let [zone, vehicles] of zonesMap.entries()) {
+            html += `<div class="geozone-card"><div class="geozone-header">📍 Геозона: ${zone}</div>
+                     <table class="geozone-table"><thead><tr><th>Гос номер</th><th>Статус</th><th>Последняя проверка</th><th>Дней без проверки</th></tr></thead><tbody>`;
+            for (let v of vehicles) {
+                const badge = v.status === 'danger' ? '<span class="badge badge-red">Красный (>90 дн/нет)</span>' : '<span class="badge badge-yellow">Жёлтый (30–90 дн)</span>';
+                html += `<tr><td><strong>${v.plate}</strong></td><td>${badge}</td><td>${v.lastCheck}</td><td>${v.days === '—' ? '—' : v.days + ' дн'}</td></tr>`;
+            }
+            html += `</tbody></table></div>`;
+        }
+        container.innerHTML = html;
+    }
+
+    function exportProblemsCSV() {
+        const days = parseInt(document.getElementById('problemDays').value);
+        const today = new Date().toISOString().split('T')[0];
+        let rows = [];
+        for (let plate of allVehicles) {
+            const cls = getColorClass(plate, today);
+            if (cls !== 'cell-good') {
+                const last = getLastCheck(plate);
+                const lastDate = last ? last.date : 'никогда';
+                const daysSince = last ? Math.floor((new Date() - new Date(last.date))/(1000*3600*24)) : '—';
+                const primaryZone = getPrimaryZone(plate, days) || 'не определена';
+                rows.push({
+                    'Гос номер': plate,
+                    'Статус': cls === 'cell-warning' ? 'Жёлтый (30-90 дней)' : 'Красный (>90 дней или нет проверки)',
+                    'Последняя проверка': lastDate,
+                    'Дней без проверки': daysSince,
+                    'Основная геозона (утро)': primaryZone
+                });
+            }
+        }
+        if (rows.length === 0) { alert('Нет проблемных ТС'); return; }
+        let csv = Object.keys(rows[0]).join(';') + '\n';
+        rows.forEach(row => { csv += Object.values(row).map(v => `"${v}"`).join(';') + '\n'; });
+        const blob = new Blob(["\uFEFF" + csv], {type: 'text/csv;charset=utf-8;'});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `engs_problem_vehicles_${days}days.csv`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+
+    function renderChecksLog() {
+        const tbody = document.getElementById('checksLogBody');
+        document.getElementById('checksCount').innerText = checks.length;
+        if (checks.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4">Нет записей</td></tr>';
+            return;
+        }
+        let html = '';
+        for (let ch of checks.slice().reverse()) {
+            const linkDisplay = ch.file_link ? `<a href="${ch.file_link}" target="_blank" style="color:var(--engs-cyan);">Открыть</a>` : '—';
+            html += `<tr>
+                        <td>${new Date(ch.date).toLocaleDateString('ru-RU')}</td>
+                        <td><strong>${ch.plate}</strong></td>
+                        <td>${linkDisplay}</td>
+                        <td><button class="delete-check" data-id="${ch.id}">🗑 Удалить</button></td>
+                     </tr>`;
+        }
+        tbody.innerHTML = html;
+        document.querySelectorAll('.delete-check').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(btn.getAttribute('data-id'));
+                checks = checks.filter(c => c.id !== id);
+                saveToLocalStorage();
+                renderChecksLog();
+                const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-tab');
+                if (activeTab === 'matrix') {
+                    const start = document.getElementById('startDate').value;
+                    const end = document.getElementById('endDate').value;
+                    if (start && end) renderMatrix(start, end);
+                } else if (activeTab === 'problems') {
+                    loadProblems(parseInt(document.getElementById('problemDays').value));
+                }
+            });
+        });
+    }
+
+    function addCheck(plate, date, fileLink) {
+        checks.push({ id: Date.now(), date, plate, file_link: fileLink });
+        saveToLocalStorage();
+        renderChecksLog();
+        const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-tab');
+        if (activeTab === 'matrix') {
+            const start = document.getElementById('startDate').value;
+            const end = document.getElementById('endDate').value;
+            if (start && end) renderMatrix(start, end);
+        } else if (activeTab === 'problems') {
+            loadProblems(parseInt(document.getElementById('problemDays').value));
+        }
+    }
+
+    function setupAutocomplete() {
+        const input = document.getElementById('vehiclePlateInput');
+        const listDiv = document.getElementById('autocompleteList');
+        input.addEventListener('input', () => {
+            const val = input.value.toUpperCase();
+            if (!val) { listDiv.style.display = 'none'; return; }
+            const matches = allVehicles.filter(v => v.includes(val)).slice(0, 12);
+            if (matches.length) {
+                listDiv.innerHTML = matches.map(m => `<div class="autocomplete-item" onclick="selectPlate('${m}')">${m}</div>`).join('');
+                listDiv.style.display = 'block';
+            } else listDiv.style.display = 'none';
+        });
+        document.addEventListener('click', (e) => { if (e.target !== input) listDiv.style.display = 'none'; });
+    }
+    window.selectPlate = function(plate) {
+        document.getElementById('vehiclePlateInput').value = plate;
+        document.getElementById('autocompleteList').style.display = 'none';
+    };
+
+    const modal = document.getElementById('checkModal');
+    function openModal() {
+        modal.style.display = 'flex';
+        document.getElementById('checkDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('vehiclePlateInput').value = '';
+        document.getElementById('fileLink').value = '';
+    }
+    function closeModal() { modal.style.display = 'none'; }
+    document.getElementById('openModalBtn').onclick = openModal;
+    document.getElementById('modalCancelBtn').onclick = closeModal;
+    document.getElementById('modalSaveBtn').onclick = () => {
+        const date = document.getElementById('checkDate').value;
+        const plate = document.getElementById('vehiclePlateInput').value.trim().toUpperCase();
+        const link = document.getElementById('fileLink').value.trim();
+        if (!date || !plate) { alert('Заполните дату и гос номер'); return; }
+        addCheck(plate, date, link);
+        closeModal();
+    };
+    window.onclick = (e) => { if (e.target === modal) closeModal(); };
+
+    function setDefaultPeriod() {
+        const today = new Date();
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+        const lastDay = new Date(today.getFullYear(), today.getMonth()+1, 0).toISOString().split('T')[0];
+        document.getElementById('startDate').value = firstDay;
+        document.getElementById('endDate').value = lastDay;
+    }
+    async function onPeriodChange() {
+        const type = document.getElementById('periodType').value;
+        let start, end;
+        const today = new Date();
+        if (type === 'month') {
+            start = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+            end = new Date(today.getFullYear(), today.getMonth()+1, 0).toISOString().split('T')[0];
+        } else if (type === 'quarter') {
+            const quarter = Math.floor(today.getMonth() / 3);
+            start = new Date(today.getFullYear(), quarter*3, 1).toISOString().split('T')[0];
+            end = new Date(today.getFullYear(), quarter*3+3, 0).toISOString().split('T')[0];
+        } else {
+            start = document.getElementById('startDate').value;
+            end = document.getElementById('endDate').value;
+        }
+        document.getElementById('startDate').value = start;
+        document.getElementById('endDate').value = end;
+        await renderMatrix(start, end);
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const tabId = btn.getAttribute('data-tab');
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            if (tabId === 'matrix') {
+                const start = document.getElementById('startDate').value;
+                const end = document.getElementById('endDate').value;
+                if (start && end) renderMatrix(start, end);
+            } else if (tabId === 'problems') {
+                loadProblems(parseInt(document.getElementById('problemDays').value));
+            } else if (tabId === 'checkslog') {
+                renderChecksLog();
+            }
+        });
+    });
+
+    document.getElementById('applyPeriodBtn').addEventListener('click', onPeriodChange);
+    document.getElementById('refreshProblemsBtn').addEventListener('click', () => loadProblems(parseInt(document.getElementById('problemDays').value)));
+    document.getElementById('exportProblemsBtn').addEventListener('click', exportProblemsCSV);
+
+    loadFromLocalStorage();
+    setDefaultPeriod();
+    onPeriodChange().then(() => {
+        loadProblems(90);
+        renderChecksLog();
+    });
+    setupAutocomplete();
+</script>
+</body>
+</html>

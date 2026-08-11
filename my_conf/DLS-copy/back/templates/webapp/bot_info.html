@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>О боте</title>
+    <style>
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; padding: 16px; background: #f7f7f9; }
+        .container { max-width: 720px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .title { font-size: 22px; font-weight: 700; margin: 0; }
+        .subtitle { color: #666; margin: 0; font-size: 14px; }
+        .image { width: 100%; max-height: 260px; object-fit: cover; border-radius: 10px; margin: 12px 0 16px; }
+        .content { line-height: 1.6; font-size: 16px; color: #1f1f1f; }
+        .footer { margin-top: 20px; color: #777; font-size: 13px; }
+    </style>
+    <script>
+        function closeWebApp() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.close();
+            }
+        }
+    </script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 class="title">ℹ️ О боте</h1>
+                {% if company_name %}<p class="subtitle">Компания: {{ company_name }}</p>{% endif %}
+            </div>
+        </div>
+
+        {% if image_help_url %}
+            <img class="image" src="{{ image_help_url }}" alt="О боте" />
+        {% endif %}
+
+        <div class="content">
+            {% if bot_help_html %}
+                {{ bot_help_html|safe }}
+            {% else %}
+                <p>Информация о боте будет доступна здесь.</p>
+            {% endif %}
+        </div>
+
+        <div class="footer">
+            {% if bot_version %}<div>Версия: {{ bot_version }}</div>{% endif %}
+            {% if current_year %}<div>© {{ current_year }}</div>{% endif %}
+        </div>
+    </div>
+</body>
+</html>
+
+

@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}ЭНГС{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/engs.css' %}">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="site-header">
+            <div>
+                <p class="site-kicker">ЭНГС</p>
+                <h1 class="site-title">Контроль проверок транспортных средств</h1>
+            </div>
+            <div class="site-actions">
+                <a class="header-link" href="{% url 'admin:index' %}">Админка</a>
+                <span class="header-user">{{ request.user.get_full_name|default:request.user.username }}</span>
+            </div>
+        </header>
+
+        <nav class="page-tabs">
+            <a href="{% url 'reports:matrix' %}" class="page-tab {% if active_page == 'matrix' %}is-active{% endif %}">
+                Календарная матрица
+            </a>
+            <a href="{% url 'reports:problems' %}" class="page-tab {% if active_page == 'problems' %}is-active{% endif %}">
+                Проблемные ТС
+            </a>
+        </nav>
+
+        <main class="page-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

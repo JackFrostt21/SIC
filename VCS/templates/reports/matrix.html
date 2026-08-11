@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Календарная матрица | ЭНГС{% endblock %}
+
+{% block content %}
+    <section class="panel">
+        <form method="get" class="filter-form">
+            <div class="field-group">
+                <label for="id_date_from">Начало периода</label>
+                <input id="id_date_from" type="date" name="date_from" value="{{ date_from|date:'Y-m-d' }}">
+            </div>
+            <div class="field-group">
+                <label for="id_date_to">Конец периода</label>
+                <input id="id_date_to" type="date" name="date_to" value="{{ date_to|date:'Y-m-d' }}">
+            </div>
+            <button type="submit" class="btn-primary">Показать</button>
+            <p class="form-hint">Максимальный диапазон: {{ max_matrix_days }} дня.</p>
+        </form>
+    </section>
+
+    <section class="stats-grid">
+        <article class="stat-card">
+            <span class="stat-label">Всего ТС</span>
+            <strong class="stat-value">{{ summary_total }}</strong>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">Актуальные</span>
+            <strong class="stat-value">{{ summary_good }}</strong>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">Жёлтые</span>
+            <strong class="stat-value">{{ summary_warning }}</strong>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">Красные</span>
+            <strong class="stat-value">{{ summary_danger }}</strong>
+        </article>
+    </section>
+
+    <section class="panel">
+        <div class="legend">
+            <span class="legend-item"><span class="legend-swatch cell-good"></span> менее 30 дней</span>
+            <span class="legend-item"><span class="legend-swatch cell-warning"></span> 30–90 дней</span>
+            <span class="legend-item"><span class="legend-swatch cell-danger"></span> более 90 дней или нет проверки</span>
+            <span class="legend-item"><span class="inspection-dot"></span> проверка в этот день</span>
+        </div>
+
+        <div class="table-wrap">
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th class="sticky-col">Госномер</th>
+                        {% for current_date in dates %}
+                            <th>{{ current_date|date:"d.m" }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            <th class="sticky-col vehicle-col">{{ row.vehicle.plate_number }}</th>
+                            {% for cell in row.cells %}
+                                <td class="{{ cell.css_class }}">
+                                    {% if cell.file_url %}
+                                        <a href="{{ cell.file_url }}" target="_blank" rel="noopener noreferrer" class="matrix-link">
+                                            <span class="cell-label">{{ cell.label }}</span>
+                                            {% if cell.has_inspection %}<span class="inspection-dot"></span>{% endif %}
+                                        </a>
+                                    {% else %}
+                                        <span class="matrix-link is-static">
+                                            <span class="cell-label {% if cell.label == '—' %}is-muted{% endif %}">{{ cell.label }}</span>
+                                            {% if cell.has_inspection %}<span class="inspection-dot"></span>{% endif %}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="{{ dates|length|add:1 }}" class="empty-state">Нет активных ТС для отображения.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+{% endblock %}

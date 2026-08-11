@@ -1,0 +1,7 @@
+from django.apps import AppConfig
+
+
+class LearningAppConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "app.learning_app"
+    verbose_name = "Обучение"

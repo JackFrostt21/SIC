@@ -1,0 +1,16 @@
+.dlsbot
+.env
+.cursor
+.agents
+skills-lock.json
+.docs
+db.sqlite3
+cert.pem
+key.pem
+.vscode
+media/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class

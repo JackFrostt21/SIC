@@ -1,0 +1,37 @@
+stages:
+  - lint
+  - test
+
+variables:
+  POSTGRES_USER: 'config_project'
+  POSTGRES_PASSWORD: ''
+  POSTGRES_DB: 'test_config_project'
+  POSTGRES_HOST_AUTH_METHOD: trust
+
+precommit:
+  stage: lint
+  image: ghcr.io/astral-sh/uv:python3.14-bookworm
+  variables:
+    PRE_COMMIT_HOME: ${CI_PROJECT_DIR}/.cache/pre-commit
+  cache:
+    paths:
+      - ${PRE_COMMIT_HOME}
+  before_script:
+    - uv venv
+    - uv pip install -q pre-commit pre-commit-uv
+  script:
+    - uv run pre-commit run --show-diff-on-failure --color=always --all-files
+
+pytest:
+  stage: test
+  image: docker:25.0
+  services:
+    - docker:dind
+  before_script:
+    - docker compose -f docker-compose.local.yml build
+    - docker compose -f docker-compose.docs.yml build
+    # Ensure celerybeat does not crash due to non-existent tables
+    - docker compose -f docker-compose.local.yml run --rm django python manage.py migrate
+    - docker compose -f docker-compose.local.yml up -d
+  script:
+    - docker compose -f docker-compose.local.yml run django pytest
